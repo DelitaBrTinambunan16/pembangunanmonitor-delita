@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $totalUser   = User::count();
         $totalWarga  = Warga::count();
 
-        $proyekAktif = Proyek::latest()->take(5)->get();
+        $proyekAktif = Proyek::orderBy('created_at', 'desc')->take(5)->get();
 
         return view('Pages.dashboard', compact('totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', ));
     }

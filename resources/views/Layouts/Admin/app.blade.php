@@ -4,17 +4,16 @@
 <head>
     <meta charset="utf-8">
     <title>Pembangunan Monitoring - Bina Desa</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="{{ asset('asset-admin/img/favicon.ico') }}" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap"
+        rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -24,32 +23,35 @@
 
 </head>
 
-<body>
+<body class="bg-dark text-light">
     <div class="container-fluid position-relative d-flex p-0">
 
-
+        <!-- Sidebar -->
         @include('Layouts.Admin.sidebar')
 
-
         <!-- Content Start -->
-        <div class="content">
+        <div class="content w-100">
+            <!-- Navbar -->
             @include('Layouts.Admin.header')
 
+            <!-- Main Content -->
+            <div class="container-fluid pt-4 px-4" style="min-height: calc(100vh - 150px);">
+                @yield('content')
+            </div>
 
-            @yield('content')
-
-
-            @include('Layouts.Admin.footer')
-
+            <!-- Footer -->
+            <div class="container-fluid pt-4 px-4 mt-auto">
+                <div class="bg-secondary rounded-top p-3 text-center">
+                    @include('Layouts.Admin.footer')
+                </div>
+            </div>
         </div>
-        <!-- Content End -->
 
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+            <i class="bi bi-arrow-up"></i>
+        </a>
     </div>
 
     @include('Layouts.Admin.js')
-</body>
 
+</body>
 </html>
