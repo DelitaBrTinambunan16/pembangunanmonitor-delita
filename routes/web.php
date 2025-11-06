@@ -5,17 +5,20 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WargaController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\DashboardController;
-
+use App\Http\Controllers\AuthController;
 
 //dasboard//
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 //proyek//
+Route::get('/proyek/{id}/lihat', [ProyekController::class, 'show'])->name('proyek.show');
 Route::resource('/proyek', ProyekController::class);
 //user
+Route::get('/user/{id}/lihat', [UserController::class, 'show'])->name('user.show');
 Route::resource('/user', UserController::class);
 //Warga
+Route::get('/warga/{id}/lihat', [WargaController::class, 'show'])->name('warga.show');
 Route::resource('warga', WargaController::class);
-use App\Http\Controllers\AuthController;
+
 
 // Halaman login
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

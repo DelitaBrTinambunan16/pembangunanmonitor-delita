@@ -10,7 +10,7 @@
 
             <!-- STATISTIC CARDS -->
             <div class="row g-4 mb-4">
-                <div class="col-md-4">
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="bg-dark rounded p-4 text-center shadow-sm">
                         <h5 class="text-light">Proyek</h5>
                         <h2 class="text-primary">{{ $totalProyek }}</h2>

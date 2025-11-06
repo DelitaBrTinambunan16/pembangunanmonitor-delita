@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -49,6 +48,11 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         return view('Pages.Admin.user.edit', compact('user'));
     }
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return view('Pages.Admin.user.show', compact('user'));
+    }
 
     /**
      * Update data user
@@ -86,4 +90,3 @@ class UserController extends Controller
         return redirect()->route('user.index')->with('success', 'User berhasil dihapus!');
     }
 }
-
