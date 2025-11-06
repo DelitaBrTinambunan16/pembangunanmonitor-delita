@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Proyek;
+use App\Models\User;
+use App\Models\Warga;
 
 class DashboardController extends Controller
 {
@@ -11,7 +14,13 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('Dashboard');
+        $totalProyek = Proyek::count();
+        $totalUser   = User::count();
+        $totalWarga  = Warga::count();
+
+        $proyekAktif = Proyek::latest()->take(5)->get();
+
+        return view('dashboard', compact('totalProyek', 'totalUser', 'totalWarga', 'proyekAktif'));
     }
 
     /**

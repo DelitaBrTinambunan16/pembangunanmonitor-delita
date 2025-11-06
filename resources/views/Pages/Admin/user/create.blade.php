@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah User</title>
-    <link href="{{asset('asset-admin/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{asset('asset-admin/css/style.css')}}" rel="stylesheet">
-</head>
+@extends('Layouts.Admin.app')
+
+@section('content')
+
 <body>
     <div class="container mt-5">
         <h2 class="mb-4 text-center">Tambah Data User</h2>
@@ -35,4 +30,5 @@
         </form>
     </div>
 </body>
-</html>
+@endsection
+
