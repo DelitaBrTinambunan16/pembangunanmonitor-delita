@@ -10,12 +10,12 @@ class ProyekController extends Controller
     public function index()
     {
         $proyek = Proyek::all();
-        return view('Admin.proyek.index', compact('proyek'));
+        return view('Pages.Admin.proyek.index', compact('proyek'));
     }
 
     public function create()
     {
-        return view('Admin.proyek.create');
+        return view('Pages.Admin.proyek.create');
     }
 
     public function store(Request $request)
@@ -37,7 +37,7 @@ class ProyekController extends Controller
     public function edit($id)
     {
         $proyek = Proyek::findOrFail($id);
-        return view('Admin.proyek.edit', compact('proyek'));
+        return view('Pages.Admin.proyek.edit', compact('proyek'));
     }
 
     public function update(Request $request, $id)

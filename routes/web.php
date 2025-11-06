@@ -15,3 +15,11 @@ Route::resource('/proyek', ProyekController::class);
 Route::resource('/user', UserController::class);
 //Warga
 Route::resource('warga', WargaController::class);
+use App\Http\Controllers\AuthController;
+
+// Halaman login
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Proses login
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

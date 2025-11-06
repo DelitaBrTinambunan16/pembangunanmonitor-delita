@@ -20,7 +20,7 @@ class DashboardController extends Controller
 
         $proyekAktif = Proyek::latest()->take(5)->get();
 
-        return view('dashboard', compact('totalProyek', 'totalUser', 'totalWarga', 'proyekAktif'));
+        return view('Pages.dashboard', compact('totalProyek', 'totalUser', 'totalWarga', 'proyekAktif'));
     }
 
     /**
