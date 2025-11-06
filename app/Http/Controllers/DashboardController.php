@@ -9,64 +9,35 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Tampilkan halaman dashboard dengan data dari database.
      */
     public function index()
     {
+        // Hitung total data di setiap tabel
         $totalProyek = Proyek::count();
         $totalUser   = User::count();
         $totalWarga  = Warga::count();
 
+        // Ambil 5 proyek terbaru dari database
         $proyekAktif = Proyek::orderBy('created_at', 'desc')->take(5)->get();
 
-        return view('Pages.dashboard', compact('totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', ));
+        // Ambil jumlah proyek per tahun (untuk Chart)
+        $proyekPerTahun = Proyek::selectRaw('tahun, COUNT(*) as jumlah')
+                                ->groupBy('tahun')
+                                ->orderBy('tahun', 'asc')
+                                ->pluck('jumlah', 'tahun')
+                                ->toArray();
+
+        // Kirim semua data ke dashboard.blade.php
+        return view('Pages.dashboard', compact(
+            'totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', 'proyekPerTahun'
+        ));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function create() {}
+    public function store(Request $request) {}
+    public function show(string $id) {}
+    public function edit(string $id) {}
+    public function update(Request $request, string $id) {}
+    public function destroy(string $id) {}
 }
