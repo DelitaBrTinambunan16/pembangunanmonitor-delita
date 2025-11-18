@@ -1,4 +1,4 @@
-@extends('Layouts.Admin.app')
+@extends('layouts.admin.app')
 
 @section('content')
 
@@ -25,9 +25,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($users as $index => $user)
+                    @forelse ($users as $user)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $loop->iteration }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->created_at->format('d-m-Y') }}</td>
@@ -42,7 +42,6 @@
                                         onclick="return confirm('Yakin hapus data ini?')">Hapus</button>
                                 </form>
                             </td>
-
                         </tr>
                     @empty
                         <tr>
@@ -50,6 +49,7 @@
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
     </body>
