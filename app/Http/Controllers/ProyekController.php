@@ -37,13 +37,13 @@ class ProyekController extends Controller
     public function edit($id)
     {
         $proyek = Proyek::findOrFail($id);
-        return view('Pages.Admin.proyek.edit', compact('proyek'));
+        return view('pages.admin.proyek.edit', compact('proyek'));
     }
 
     public function show($id)
     {
         $proyek = Proyek::findOrFail($id);
-        return view('Pages.Admin.proyek.show', compact('proyek'));
+        return view('pages.admin.proyek.show', compact('proyek'));
     }
 
     public function update(Request $request, $id)

@@ -29,7 +29,7 @@ class DashboardController extends Controller
                                 ->toArray();
 
         // Kirim semua data ke dashboard.blade.php
-        return view('Pages.dashboard', compact(
+        return view('pages.dashboard', compact(
             'totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', 'proyekPerTahun'
         ));
     }

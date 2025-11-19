@@ -19,7 +19,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    @include('Layouts.Admin.css')
+    @include('layouts.admin.css')
 
 </head>
 
@@ -27,12 +27,12 @@
     <div class="container-fluid position-relative d-flex p-0">
 
         <!-- Sidebar -->
-        @include('Layouts.Admin.sidebar')
+        @include('layouts.admin.sidebar')
 
         <!-- Content Start -->
         <div class="content w-100">
             <!-- Navbar -->
-            @include('Layouts.Admin.header')
+            @include('layouts.admin.header')
 
             <!-- Main Content -->
             <div class="container-fluid pt-4 px-4" style="min-height: calc(100vh - 150px);">
@@ -42,7 +42,7 @@
             <!-- Footer -->
             <div class="container-fluid pt-4 px-4 mt-auto">
                 <div class="bg-secondary rounded-top p-3 text-center">
-                    @include('Layouts.Admin.footer')
+                    @include('layouts.admin..footer')
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
         </a>
     </div>
 
-    @include('Layouts.Admin.js')
+    @include('layouts.admin.js')
 
 </body>
 </html>

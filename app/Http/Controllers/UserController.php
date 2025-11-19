@@ -10,17 +10,18 @@ class UserController extends Controller
      * Menampilkan daftar semua user
      */
     public function index()
-    {
-        $users = User::all();
-        return view('Pages.Admin.user.index', compact('users'));
-    }
+{
+    $users = User::all();
+    return view('pages.admin.user.index', compact('users'));
+}
+
 
     /**
      * Menampilkan form tambah user
      */
     public function create()
     {
-        return view('Pages.Admin.user.create');
+        return view('pages.admin.user.create');
     }
 
     /**
@@ -37,6 +38,7 @@ class UserController extends Controller
         // Tidak perlu Hash::make karena sudah otomatis lewat casts
         User::create($request->only(['name', 'email', 'password']));
 
+        // return view('pages.admin.user.index')->with('success', 'User berhasil ditambahkan!');
         return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan!');
     }
 
@@ -46,12 +48,12 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        return view('Pages.Admin.user.edit', compact('user'));
+        return view('pages.admin.user.edit', compact('user'));
     }
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return view('Pages.Admin.user.show', compact('user'));
+        return view('pages.admin.user.show', compact('user'));
     }
 
     /**

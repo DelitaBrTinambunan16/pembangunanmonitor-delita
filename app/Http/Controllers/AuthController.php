@@ -10,7 +10,7 @@ class AuthController extends Controller
     // Tampilkan halaman login
     public function showLoginForm()
     {
-        return view('Pages.auth.login-form');
+        return view('pages.auth.login-form');
     }
 
     // Proses login
