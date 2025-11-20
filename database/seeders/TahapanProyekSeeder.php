@@ -21,7 +21,7 @@ class TahapanProyekSeeder extends Seeder
             dd("Seeder gagal: Tidak ada data proyek. Jalankan ProyekSeeder dulu.");
         }
 
-        foreach (range(1, 20) as $inde) {
+        foreach (range(1, 100) as $index) {
 
             $mulai = $faker->dateTimeBetween('-1 years', 'now');
             $selesai = $faker->dateTimeBetween($mulai, '+6 months');

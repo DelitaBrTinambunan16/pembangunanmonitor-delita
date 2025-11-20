@@ -13,7 +13,7 @@ class ProyekSeeder extends Seeder
         //gunakan id_ID untuk data indonesia
         $faker = Faker::create('id_ID');
 
-        foreach (range(1, 50) as $index) {
+        foreach (range(1, 100) as $index) {
             DB::table('proyek')->insert([
                 'kode_proyek' => 'PRJ-' . strtoupper($faker->unique()->bothify('??###')),
                 'nama_proyek' => $faker->sentence(3),

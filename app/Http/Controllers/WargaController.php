@@ -11,7 +11,7 @@ class WargaController extends Controller
      */
     public function index()
     {
-        $warga = Warga::all();
+        $warga = Warga::simplePaginate(10);
         return view('Pages.Admin.warga.index', compact('warga'));
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Proyek;
@@ -9,7 +8,7 @@ class ProyekController extends Controller
 {
     public function index()
     {
-        $proyek = Proyek::all();
+        $proyek = Proyek::simplePaginate(10);
         return view('pages.admin.proyek.index', compact('proyek'));
     }
 
@@ -23,11 +22,11 @@ class ProyekController extends Controller
         $request->validate([
             'kode_proyek' => 'required|unique:proyek',
             'nama_proyek' => 'required',
-            'tahun' => 'required|digits:4',
-            'lokasi' => 'required',
-            'anggaran' => 'required|numeric',
+            'tahun'       => 'required|digits:4',
+            'lokasi'      => 'required',
+            'anggaran'    => 'required|numeric',
             'sumber_dana' => 'required',
-            'deskripsi' => 'nullable',
+            'deskripsi'   => 'nullable',
         ]);
 
         Proyek::create($request->all());
@@ -53,11 +52,11 @@ class ProyekController extends Controller
         $request->validate([
             'kode_proyek' => 'required|unique:proyek,kode_proyek,' . $id . ',proyek_id',
             'nama_proyek' => 'required',
-            'tahun' => 'required|digits:4',
-            'lokasi' => 'required',
-            'anggaran' => 'required|numeric',
+            'tahun'       => 'required|digits:4',
+            'lokasi'      => 'required',
+            'anggaran'    => 'required|numeric',
             'sumber_dana' => 'required',
-            'deskripsi' => 'nullable',
+            'deskripsi'   => 'nullable',
         ]);
 
         $proyek->update($request->all());

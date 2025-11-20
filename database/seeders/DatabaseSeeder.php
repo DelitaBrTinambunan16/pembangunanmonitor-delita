@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProyekSeeder::class,
             TahapanProyekSeeder::class,
+            WargaSeeder::class,
         ]);
 
     }

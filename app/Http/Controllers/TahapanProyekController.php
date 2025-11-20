@@ -11,7 +11,7 @@ class TahapanProyekController extends Controller
     // Menampilkan semua tahapan proyek
     public function index()
     {
-        $tahapan = TahapanProyek::with('proyek')->get();
+        $tahapan = TahapanProyek::simplePaginate(10);
         return view('pages.admin.tahapan.index', compact('tahapan'));
     }
 
@@ -19,7 +19,17 @@ class TahapanProyekController extends Controller
     public function create()
     {
         $proyek = Proyek::all();
-        return view('pages.admin.tahapan.create', compact('proyek'));
+
+        // Tambahkan daftar pilihan nama tahap
+        $pilihanTahap = [
+            'Perencanaan',
+            'Persiapan',
+            'Pelaksanaan',
+            'Pengawasan',
+            'Penyelesaian'
+        ];
+
+        return view('pages.admin.tahapan.create', compact('proyek', 'pilihanTahap'));
     }
 
     // Menyimpan data tahapan baru
@@ -44,7 +54,17 @@ class TahapanProyekController extends Controller
     {
         $tahapan = TahapanProyek::findOrFail($id);
         $proyek = Proyek::all();
-        return view('pages.admin.tahapan.edit', compact('tahapan', 'proyek'));
+
+        // Tambahkan daftar pilihan nama tahap
+        $pilihanTahap = [
+            'Perencanaan',
+            'Persiapan',
+            'Pelaksanaan',
+            'Pengawasan',
+            'Penyelesaian'
+        ];
+
+        return view('pages.admin.tahapan.edit', compact('tahapan', 'proyek', 'pilihanTahap'));
     }
 
     // Menyimpan perubahan tahapan
