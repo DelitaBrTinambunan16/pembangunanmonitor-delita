@@ -1,4 +1,4 @@
-@extends('Layouts.auth.app')
+@extends('layouts.auth.app')
 
 @section('content')
 <div class="container-fluid bg-dark text-light d-flex align-items-center justify-content-center min-vh-100">
