@@ -65,7 +65,7 @@
                 @endforelse
             </tbody>
         </table>
-
+{{-- paginatoion simple bootstrap 5 --}}
         <div class="mt-3">
             {{ $proyek->links('pagination::simple-bootstrap-5') }}
         </div>

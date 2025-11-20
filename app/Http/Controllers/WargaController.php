@@ -9,9 +9,15 @@ class WargaController extends Controller
     /**
      * Tampilkan semua data warga
      */
-    public function index()
+    public function index(Request $request)
     {
-        $warga = Warga::simplePaginate(10);
+        //Daftar kolom yang bisa difilter sesuai pada form pencarian
+        $filterableColumns = ['Jenis_Kelamin'];
+
+        //Gunakan scope filter pada model Warga untuk memproses query filter
+        $warga = Warga::filter($request, $filterableColumns)
+                      ->simplePaginate(10);
+
         return view('Pages.Admin.warga.index', compact('warga'));
     }
 
