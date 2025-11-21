@@ -13,7 +13,17 @@
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
+            {{-- FILTER EMAIL --}}
+            <form method="GET" action="{{ route('user.index') }}" class="mb-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <input type="text" name="email" class="form-control" placeholder="Cari Email..."
+                            value="{{ request('email') }}" onchange="this.form.submit()">
 
+                        </select>
+                    </div>
+                </div>
+            </form>
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
@@ -51,6 +61,8 @@
                 </tbody>
 
             </table>
+             <div class="mt-3">
+            {{ $users->links('pagination::simple-bootstrap-5') }}
         </div>
     </body>
 @endsection

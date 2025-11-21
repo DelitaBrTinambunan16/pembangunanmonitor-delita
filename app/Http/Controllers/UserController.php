@@ -9,9 +9,12 @@ class UserController extends Controller
     /**
      * Menampilkan daftar semua user
      */
-    public function index()
+    public function index(Request $request)
 {
-    $users = User::all();
+    //Daftar kolom yang bisa difilter sesuai pada form pencarian
+    $filterableColumns = ['email'];
+    //Gunakan scope filter pada model User untuk memproses query filter
+    $users = User::filter($request, $filterableColumns)->simplePaginate(10);
     return view('pages.admin.user.index', compact('users'));
 }
 
