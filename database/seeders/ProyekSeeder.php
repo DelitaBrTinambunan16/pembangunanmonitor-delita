@@ -16,7 +16,7 @@ class ProyekSeeder extends Seeder
         foreach (range(1, 100) as $index) {
             DB::table('proyek')->insert([
                 'kode_proyek' => 'PRJ-' . strtoupper($faker->unique()->bothify('??###')),
-                'nama_proyek' => $faker->sentence(3),
+                'nama_proyek' =>  $faker->randomElement($jenisProyek) . ' ' . $faker->city(),
                 'tahun' => $faker->year(),
                 'lokasi' => $faker->city(),
                 'anggaran' => $faker->randomFloat(2, 10000000, 500000000),

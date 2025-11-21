@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TahapanProyek extends Model
@@ -25,4 +26,13 @@ class TahapanProyek extends Model
     {
         return $this->belongsTo(Proyek::class, 'proyek_id', 'proyek_id');
     }
+    public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+{
+    foreach ($filterableColumns as $column) {
+        if ($request->filled($column)) {
+            $query->where($column, $request->input($column));
+        }
+    }
+    return $query;
+}
 }

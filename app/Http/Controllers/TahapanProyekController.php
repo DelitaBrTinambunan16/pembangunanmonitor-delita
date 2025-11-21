@@ -8,10 +8,12 @@ use App\Models\Proyek;
 
 class TahapanProyekController extends Controller
 {
-    // Menampilkan semua tahapan proyek
-    public function index()
+    public function index(Request $request)
     {
-        $tahapan = TahapanProyek::simplePaginate(10);
+        //Daftar kolom yang bisa difilter sesuai pada form pencarian
+        $filterableColumns = ['nama_tahap'];
+        //Gunakan scope filter pada model TahapanProyek untuk memproses query filter
+        $tahapan = TahapanProyek::filter($request, $filterableColumns)->simplePaginate(10);
         return view('pages.admin.tahapan.index', compact('tahapan'));
     }
 
