@@ -11,8 +11,21 @@ class ProyekController extends Controller
         // Daftar kolom yang bisa difilter sesuai pada form pencarian
         $filterableColumns = ['sumber_dana'];
 
+        //Search
+        $searchableColumns = [
+            'nama_proyek',
+            'lokasi',
+            'tahun',
+            'kode_proyek',
+            'anggaran',
+            'sumber_dana',
+            'deskripsi',
+        ];
         // //Gunakan scope filter pada model proyek untuk memproses query filter
-        $proyek = Proyek::filter($request, $filterableColumns) -> simplePaginate(10);
+        $proyek = Proyek::filter($request, $filterableColumns)
+            ->search($request, $searchableColumns)
+            ->simplePaginate(10);
+
         return view('pages.admin.proyek.index', compact('proyek'));
     }
 
