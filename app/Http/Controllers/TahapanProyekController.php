@@ -12,8 +12,19 @@ class TahapanProyekController extends Controller
     {
         //Daftar kolom yang bisa difilter sesuai pada form pencarian
         $filterableColumns = ['nama_tahap'];
+
+        //Search
+        $searchableColumns = [
+            'proyek_id',
+            'nama_tahap',
+            'target_persen',
+            'tgl_mulai',
+            'tgl_selesai'
+        ];
         //Gunakan scope filter pada model TahapanProyek untuk memproses query filter
-        $tahapan = TahapanProyek::filter($request, $filterableColumns)->simplePaginate(10);
+        $tahapan = TahapanProyek::filter($request, $filterableColumns)
+        ->search($request, $searchableColumns)
+        ->simplePaginate(10);
         return view('pages.admin.tahapan.index', compact('tahapan'));
     }
 
