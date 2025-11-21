@@ -12,11 +12,23 @@ class WargaController extends Controller
     public function index(Request $request)
     {
         //Daftar kolom yang bisa difilter sesuai pada form pencarian
-        $filterableColumns = ['Jenis_Kelamin'];
+        $filterableColumns = ['jenis_kelamin'];
+
+        //Search
+        $searchableColumns = [
+            'no_ktp',
+            'nama',
+            'jenis_kelamin',
+            'agama',
+            'pekerjaan',
+            'telp',
+            'email',
+        ];
 
         //Gunakan scope filter pada model Warga untuk memproses query filter
         $warga = Warga::filter($request, $filterableColumns)
-                      ->simplePaginate(10);
+            ->search($request, $searchableColumns)
+            ->simplePaginate(10);
 
         return view('Pages.Admin.warga.index', compact('warga'));
     }
