@@ -42,7 +42,7 @@
             <!-- Footer -->
             <div class="container-fluid pt-4 px-4 mt-auto">
                 <div class="bg-secondary rounded-top p-3 text-center">
-                    @include('layouts.admin..footer')
+                    @include('layouts.admin.footer')
                 </div>
             </div>
         </div>
