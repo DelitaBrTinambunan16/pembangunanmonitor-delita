@@ -13,12 +13,19 @@ class UserController extends Controller
 {
     //Daftar kolom yang bisa difilter sesuai pada form pencarian
     $filterableColumns = ['email'];
+
+    // Search
+    $searchableColumns = [
+        'name',
+        'email',
+    ];
+
     //Gunakan scope filter pada model User untuk memproses query filter
-    $users = User::filter($request, $filterableColumns)->simplePaginate(10);
+    $users = User::filter($request, $filterableColumns)
+    -> search($request, $searchableColumns)
+    ->simplePaginate(10);
     return view('pages.admin.user.index', compact('users'));
 }
-
-
     /**
      * Menampilkan form tambah user
      */
