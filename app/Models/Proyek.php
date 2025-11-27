@@ -22,6 +22,8 @@ class Proyek extends Model
         'sumber_dana',
         'deskripsi',
     ];
+
+    // Function ini yang akan menjadi function untuk filter data sesuai request yang dikirimkan
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
 {
     foreach ($filterableColumns as $column) {

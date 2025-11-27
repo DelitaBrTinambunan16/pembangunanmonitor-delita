@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 
 class ProyekController extends Controller
 {
+    // Tambahkan parameter Request $request pada function index()
     public function index(Request $request)
     {
         // Daftar kolom yang bisa difilter sesuai pada form pencarian
         $filterableColumns = ['sumber_dana'];
 
-        //Search
+        // berisikan array pada nama kolom yang akan dicari saat searching
         $searchableColumns = [
             'nama_proyek',
             'lokasi',
@@ -23,8 +24,8 @@ class ProyekController extends Controller
         ];
         // //Gunakan scope filter pada model proyek untuk memproses query filter
         $proyek = Proyek::filter($request, $filterableColumns)
-            ->search($request, $searchableColumns)
-            ->simplePaginate(10);
+            ->search($request, $searchableColumns)  // untuk memanggil fitur search pada model nantinya.
+            ->simplePaginate(10); // Pagination 10 data per halaman
 
         return view('pages.admin.proyek.index', compact('proyek'));
     }

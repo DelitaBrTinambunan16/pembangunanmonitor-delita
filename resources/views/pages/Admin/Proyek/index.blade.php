@@ -98,7 +98,7 @@
             </tbody>
         </table>
 
-        {{-- pagination simple bootstrap 5 --}}
+        {{-- pagination simple bootstrap 5  untuk menampilkan list tombol untuk berpindah halaman lainnya--}}
         <div class="mt-3">
             {{ $proyek->links('pagination::simple-bootstrap-5') }}
         </div>
