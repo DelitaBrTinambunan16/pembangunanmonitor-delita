@@ -10,22 +10,22 @@ class UserController extends Controller
      * Menampilkan daftar semua user
      */
     public function index(Request $request)
-{
-    //Daftar kolom yang bisa difilter sesuai pada form pencarian
-    $filterableColumns = ['email'];
+    {
+        //Daftar kolom yang bisa difilter sesuai pada form pencarian
+        $filterableColumns = ['email'];
 
-    // Search
-    $searchableColumns = [
-        'name',
-        'email',
-    ];
+        // Search
+        $searchableColumns = [
+            'name',
+            'email',
+        ];
 
-    //Gunakan scope filter pada model User untuk memproses query filter
-    $users = User::filter($request, $filterableColumns)
-    -> search($request, $searchableColumns)
-    ->simplePaginate(10);
-    return view('pages.admin.user.index', compact('users'));
-}
+        //Gunakan scope filter pada model User untuk memproses query filter
+        $users = User::filter($request, $filterableColumns)
+            ->search($request, $searchableColumns)
+            ->simplePaginate(10);
+        return view('pages.admin.user.index', compact('users'));
+    }
     /**
      * Menampilkan form tambah user
      */
@@ -43,10 +43,17 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
+            'role'     => 'required|in:admin,staff,user',
         ]);
 
-        // Tidak perlu Hash::make karena sudah otomatis lewat casts
-        User::create($request->only(['name', 'email', 'password']));
+        $data = [
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => $request->role,
+        ];
+
+        User::create($data);
 
         // return view('pages.admin.user.index')->with('success', 'User berhasil ditambahkan!');
         return redirect()->route('user.index')->with('success', 'User berhasil ditambahkan!');
@@ -77,13 +84,15 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:6',
+            'role'     => 'required|in:admin,staff,user',
         ]);
 
-        $data = $request->only(['name', 'email']);
+        $data = $request->only(['name', 'email', 'role']);
 
         // Jika password diisi, otomatis di-hash karena cast
         if ($request->filled('password')) {
             $data['password'] = $request->password;
+
         }
 
         $user->update($data);

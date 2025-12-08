@@ -1,43 +1,55 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Tampilkan halaman login
-    public function showLoginForm()
+    public function index()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('pages.auth.login-form');
     }
 
-    // Proses login
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email'    => ['required', 'email'],
-            'password' => ['required'],
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/')->with('success', 'Login berhasil!');
+        $user = User::where('email', $request->email)->first();
+        if ($user && Hash::check($request->password, $user->password)) {
+            Auth::login($user);
+            // Simpan pesan ke session
+            session(['last_login' => now()]);
+            // Redirect ke halaman dashboard
+            return redirect()->route('dashboard')->with('success', 'Login berhasil!');
+        } else {
+            return back()->withErrors(['email' => 'Email atau password salah'])->withInput();
         }
-
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->onlyInput('email');
     }
-
+    public function showLoginForm()
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('pages.auth.login-form');
+    }
     // Logout
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->session()->invalidate();      // Hapus semua session
+        $request->session()->regenerateToken(); // Cegah CSRF
 
-        return redirect('/login')->with('success', 'Berhasil logout.');
+        // Redirect ke halaman login
+        return redirect()->route('login');
     }
 }

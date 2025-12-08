@@ -42,9 +42,15 @@
 <div class="bg-secondary rounded p-4 shadow-sm">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="text-white mb-0">Daftar Proyek Terbaru</h5>
-        <a href="{{ route('proyek.index') }}" class="btn btn-danger btn-sm">
-            <i class="fa fa-eye me-1"></i> Lihat Semua
-        </a>
+        @auth
+            <a href="{{ route('proyek.index') }}" class="btn btn-danger btn-sm">
+                <i class="fa fa-eye me-1"></i> Lihat Semua
+            </a>
+        @else
+            <a href="{{ route('login') }}" class="btn btn-danger btn-sm">
+                <i class="fa fa-sign-in me-1"></i> Login
+            </a>
+        @endauth
     </div>
 
     <div class="table-responsive">

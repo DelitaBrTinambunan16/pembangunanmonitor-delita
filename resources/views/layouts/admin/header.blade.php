@@ -12,20 +12,24 @@
     <div class="navbar-nav align-items-center ms-auto">
 
         <div class="nav-item dropdown">
-            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                <img class="rounded-circle me-lg-2" src="{{ asset('asset-admin/img/deli.jpg') }}" alt=""
-                    style="width: 40px; height: 40px;">
-                <span class="d-none d-lg-inline-flex">Admin</span>
-            </a>
-            <!-- Dropdown menu -->
-            <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
-                <a href="#" id="logout-btn" class="dropdown-item text-danger">
-                    <i class="fa fa-sign-out-alt me-2"></i> Log Out
+            @if (Auth::check())
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <img class="rounded-circle me-lg-2" src="{{ asset('asset-admin/img/deli.jpg') }}" alt=""
+                        style="width: 40px; height: 40px;">
+                    <span class="d-none d-lg-inline-flex">{{ Auth::user()->name }} {{ session('last_login') }}</span>
                 </a>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </div>
+                <!-- Dropdown menu -->
+                <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                        @csrf
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fa fa-sign-out-alt me-2"></i> Log Out
+                        </button>
+                    </form>
+                </div>
+            @else
+                <a class="btn btn-success" href="{{ route('auth') }}">Login</a>
+            @endif
         </div>
     </div>
 </nav>

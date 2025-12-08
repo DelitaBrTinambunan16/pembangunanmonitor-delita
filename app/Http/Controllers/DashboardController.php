@@ -5,6 +5,7 @@ use App\Models\Proyek;
 use App\Models\User;
 use App\Models\Warga;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -13,31 +14,41 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        // Kalau belum login, arahkan ke halaman login
+        if (! Auth::check()) {
+            return redirect()->route('login')->withErrors('Silahkan login terlebih dahulu.');
+        }
+
         // Hitung total data di setiap tabel
         $totalProyek = Proyek::count();
         $totalUser   = User::count();
         $totalWarga  = Warga::count();
 
-        // Ambil 5 proyek terbaru dari database
+        // Ambil 5 proyek terbaru
         $proyekAktif = Proyek::orderBy('created_at', 'desc')->take(5)->get();
 
-        // Ambil jumlah proyek per tahun (untuk Chart)
+        // Data per tahun untuk Chart
         $proyekPerTahun = Proyek::selectRaw('tahun, COUNT(*) as jumlah')
-                                ->groupBy('tahun')
-                                ->orderBy('tahun', 'asc')
-                                ->pluck('jumlah', 'tahun')
-                                ->toArray();
+            ->groupBy('tahun')
+            ->orderBy('tahun', 'asc')
+            ->pluck('jumlah', 'tahun')
+            ->toArray();
 
-        // Kirim semua data ke dashboard.blade.php
         return view('pages.dashboard', compact(
             'totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', 'proyekPerTahun'
         ));
     }
 
-    public function create() {}
-    public function store(Request $request) {}
-    public function show(string $id) {}
-    public function edit(string $id) {}
-    public function update(Request $request, string $id) {}
-    public function destroy(string $id) {}
+    public function create()
+    {}
+    public function store(Request $request)
+    {}
+    public function show(string $id)
+    {}
+    public function edit(string $id)
+    {}
+    public function update(Request $request, string $id)
+    {}
+    public function destroy(string $id)
+    {}
 }
