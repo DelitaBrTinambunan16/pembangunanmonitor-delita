@@ -23,11 +23,11 @@ class ProyekController extends Controller
             'deskripsi',
         ];
         // //Gunakan scope filter pada model proyek untuk memproses query filter
-        $proyek = Proyek::filter($request, $filterableColumns)
+        $proyeks = Proyek::filter($request, $filterableColumns)
             ->search($request, $searchableColumns)  // untuk memanggil fitur search pada model nantinya.
             ->simplePaginate(10); // Pagination 10 data per halaman
 
-        return view('pages.admin.proyek.index', compact('proyek'));
+        return view('pages.admin.proyek.index', compact('proyeks'));
     }
 
     public function create()

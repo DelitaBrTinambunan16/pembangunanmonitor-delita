@@ -14,21 +14,6 @@
                 </div>
             </a>
         </div>
-        {{--
-        <!-- Profil Admin -->
-        <div class="d-flex flex-column align-items-center text-center mt-4 mb-4">
-            <div class="position-relative mb-2">
-                <img class="rounded-circle border border-2 border-light"
-                     src="{{ asset('asset-admin/img/deli.jpg') }}"
-                     alt="Foto Admin"
-                     style="width: 60px; height: 60px; object-fit: cover;">
-                <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-            </div>
-            <div>
-                <h6 class="mb-0 text-light fw-semibold">Delita</h6>
-                <span class="text-muted small">Admin</span>
-            </div>
-        </div> --}}
 
         <!-- Navigasi -->
         <div class="navbar-nav w-100 mt-2">
@@ -48,9 +33,26 @@
             <a href="{{ route('warga.index') }}" class="nav-item nav-link {{ Request::is('warga*') ? 'active' : '' }}">
                 <i class="fa fa-id-card me-2"></i>Warga
             </a>
+
             <a href="{{ route('tahapan.index') }}"
                 class="nav-item nav-link {{ Request::is('tahapan*') ? 'active' : '' }}">
                 <i class="fa fa-id-card me-2"></i>Tahapan Proyek
+            </a>
+
+            <!-- Link Baru -->
+            <a href="{{ route('kontraktor.index') }}"
+                class="nav-item nav-link {{ Request::is('kontraktor*') ? 'active' : '' }}">
+                <i class="fa fa-hard-hat me-2"></i>Kontraktor
+            </a>
+
+            <a href="{{ route('lokasi.index') }}"
+                class="nav-item nav-link {{ Request::is('lokasi*') ? 'active' : '' }}">
+                <i class="fa fa-map-marker-alt me-2"></i>Lokasi Proyek
+            </a>
+
+            <a href="{{ route('progres_proyek.index') }}"
+                class="nav-item nav-link {{ Request::is('progres*') ? 'active' : '' }}">
+                <i class="fa fa-tasks me-2"></i>Progres Proyek
             </a>
         </div>
     </nav>
