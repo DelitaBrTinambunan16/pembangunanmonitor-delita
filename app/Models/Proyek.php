@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +23,7 @@ class Proyek extends Model
         'deskripsi',
     ];
 
-    // Function ini yang akan menjadi function untuk filter data sesuai request yang dikirimkan
+    // Scope Filter
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
     {
         foreach ($filterableColumns as $column) {
@@ -50,6 +51,13 @@ class Proyek extends Model
     {
         return $this->hasMany(Kontraktor::class, 'proyek_id', 'proyek_id');
     }
+
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'ref_id')->where('ref_table', 'proyek');
+    }
+
+    // Scope Search 
     public function scopeSearch($query, $request, array $columns)
     {
         if ($request->filled('search')) {
@@ -59,5 +67,7 @@ class Proyek extends Model
                 }
             });
         }
+
+        return $query;
     }
 }

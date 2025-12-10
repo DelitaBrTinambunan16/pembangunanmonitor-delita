@@ -1,18 +1,17 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Proyek;
+use App\Models\Media;
 use Illuminate\Http\Request;
 
 class ProyekController extends Controller
 {
-    // Tambahkan parameter Request $request pada function index()
     public function index(Request $request)
     {
-        // Daftar kolom yang bisa difilter sesuai pada form pencarian
         $filterableColumns = ['sumber_dana'];
 
-        // berisikan array pada nama kolom yang akan dicari saat searching
         $searchableColumns = [
             'nama_proyek',
             'lokasi',
@@ -22,12 +21,18 @@ class ProyekController extends Controller
             'sumber_dana',
             'deskripsi',
         ];
-        // //Gunakan scope filter pada model proyek untuk memproses query filter
-        $proyeks = Proyek::filter($request, $filterableColumns)
-            ->search($request, $searchableColumns)  // untuk memanggil fitur search pada model nantinya.
-            ->simplePaginate(10); // Pagination 10 data per halaman
 
-        return view('pages.admin.proyek.index', compact('proyeks'));
+        // Ambil semua tahun unik untuk filter dropdown
+        $tahunList = Proyek::select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun');
+
+        $proyeks = Proyek::filter($request, $filterableColumns)
+            ->search($request, $searchableColumns)
+            ->simplePaginate(10);
+
+        return view('pages.admin.proyek.index', compact('proyeks', 'tahunList'));
     }
 
     public function create()
@@ -38,53 +43,119 @@ class ProyekController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_proyek' => 'required|unique:proyek',
+            'kode_proyek' => 'required',
             'nama_proyek' => 'required',
-            'tahun'       => 'required|digits:4',
-            'lokasi'      => 'required',
-            'anggaran'    => 'required|numeric',
+            'tahun' => 'required',
+            'lokasi' => 'required',
+            'anggaran' => 'required',
             'sumber_dana' => 'required',
-            'deskripsi'   => 'nullable',
+            'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
         ]);
 
-        Proyek::create($request->all());
-        return redirect()->route('proyek.index')->with('success', 'Data proyek berhasil ditambahkan!');
-    }
+        // Simpan data proyek
+        $proyek = Proyek::create([
+            'kode_proyek' => $request->kode_proyek,
+            'nama_proyek' => $request->nama_proyek,
+            'tahun' => $request->tahun,
+            'lokasi' => $request->lokasi,
+            'anggaran' => $request->anggaran,
+            'sumber_dana' => $request->sumber_dana,
+            'deskripsi' => $request->deskripsi,
+        ]);
 
-    public function edit($id)
-    {
-        $proyek = Proyek::findOrFail($id);
-        return view('pages.admin.proyek.edit', compact('proyek'));
+        // Multiple upload
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+
+                $filename = time() . '-' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+
+                $fileurl = 'uploads/' . $filename; // perbaikan: definisikan file_url
+
+                Media::create([
+                    'ref_table' => 'proyek',
+                    'ref_id'    => $proyek->proyek_id,
+                    'file_url'  => $fileurl,
+                    'caption'   => 'Upload Proyek',
+                    'mime_type' => $file->getClientMimeType(),
+                    'sort_order'=> 1,
+                ]);
+            }
+        }
+
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan!');
     }
 
     public function show($id)
     {
         $proyek = Proyek::findOrFail($id);
-        return view('pages.admin.proyek.show', compact('proyek'));
+        $media  = Media::where('ref_table', 'proyek')
+                        ->where('ref_id', $id)
+                        ->get();
+
+        return view('pages.admin.proyek.show', compact('proyek', 'media'));
+    }
+
+    public function edit($id)
+    {
+        $proyek = Proyek::findOrFail($id);
+
+        return view('pages.admin.proyek.edit', compact('proyek'));
     }
 
     public function update(Request $request, $id)
     {
-        $proyek = Proyek::findOrFail($id);
-
         $request->validate([
-            'kode_proyek' => 'required|unique:proyek,kode_proyek,' . $id . ',proyek_id',
+            'kode_proyek' => 'required',
             'nama_proyek' => 'required',
-            'tahun'       => 'required|digits:4',
-            'lokasi'      => 'required',
-            'anggaran'    => 'required|numeric',
+            'tahun' => 'required',
+            'lokasi' => 'required',
+            'anggaran' => 'required',
             'sumber_dana' => 'required',
-            'deskripsi'   => 'nullable',
+            'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
         ]);
 
-        $proyek->update($request->all());
-        return redirect()->route('proyek.index')->with('success', 'Data proyek berhasil diperbarui!');
+        $proyek = Proyek::findOrFail($id);
+
+        // Update data proyek
+        $proyek->update([
+            'kode_proyek' => $request->kode_proyek,
+            'nama_proyek' => $request->nama_proyek,
+            'tahun' => $request->tahun,
+            'lokasi' => $request->lokasi,
+            'anggaran' => $request->anggaran,
+            'sumber_dana' => $request->sumber_dana,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        // Upload file baru jika ada
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+
+                $filename = time() . '-' . $file->getClientOriginalName();
+                $file->move(public_path('uploads'), $filename);
+
+                $fileurl = 'uploads/' . $filename; // definisikan file_url
+
+                Media::create([
+                    'ref_table' => 'proyek',
+                    'ref_id'    => $proyek->proyek_id,
+                    'file_url'  => $fileurl,
+                    'caption'   => 'Upload Proyek',
+                    'mime_type' => $file->getClientMimeType(),
+                    'sort_order'=> 1,
+                ]);
+            }
+        }
+
+        return redirect()->route('proyek.index')->with('success', 'Proyek berhasil diperbarui!');
     }
 
     public function destroy($id)
     {
         $proyek = Proyek::findOrFail($id);
         $proyek->delete();
+
         return redirect()->route('proyek.index')->with('success', 'Data proyek berhasil dihapus!');
     }
 }

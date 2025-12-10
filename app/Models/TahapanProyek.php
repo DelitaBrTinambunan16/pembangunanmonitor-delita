@@ -26,23 +26,35 @@ class TahapanProyek extends Model
     {
         return $this->belongsTo(Proyek::class, 'proyek_id', 'proyek_id');
     }
+
+    // Relasi ke media (polymorphic manual)
+    public function media()
+    {
+        return $this->hasMany(\App\Models\Media::class, 'ref_id')
+                    ->where('ref_table', 'tahapan')
+                    ->orderBy('sort_order');
+    }
+
+    // Scope filter
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
-{
-    foreach ($filterableColumns as $column) {
-        if ($request->filled($column)) {
-            $query->where($column, $request->input($column));
+    {
+        foreach ($filterableColumns as $column) {
+            if ($request->filled($column)) {
+                $query->where($column, $request->input($column));
+            }
+        }
+        return $query;
+    }
+
+    // Scope search
+    public function scopeSearch($query, $request, array $columns)
+    {
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request, $columns) {
+                foreach ($columns as $column) {
+                    $q->orWhere($column, 'LIKE', '%' . $request->search . '%');
+                }
+            });
         }
     }
-    return $query;
-}
-public function scopeSearch($query, $request, array $columns)
-{
-    if ($request->filled('search')) {
-        $query->where(function($q) use ($request, $columns) {
-            foreach ($columns as $column) {
-                $q->orWhere($column, 'LIKE', '%' . $request->search . '%');
-            }
-        });
-    }
-}
 }

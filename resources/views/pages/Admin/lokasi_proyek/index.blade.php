@@ -3,7 +3,8 @@
 @section('content')
 <div class="container mt-4">
 
-    <h2 class="mb-4">Daftar Lokasi Proyek</h2>
+<h2 class="mb-4 text-center">Daftar Lokasi Proyek</h2>
+
 
     <div class="mb-3 text-end">
         <a href="{{ route('lokasi.create') }}" class="btn btn-primary">+ Tambah Lokasi</a>
@@ -21,7 +22,7 @@
             {{-- Filter Proyek --}}
             <div class="col-md-3">
                 <select name="proyek_id" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Semua Proyek --</option>
+                    <option value=""> Semua Proyek </option>
                     @foreach ($proyekList as $proyek)
                         <option value="{{ $proyek->proyek_id }}"
                             {{ request('proyek_id') == $proyek->proyek_id ? 'selected' : '' }}>
@@ -39,7 +40,7 @@
                         name="search"
                         class="form-control"
                         value="{{ request('search') }}"
-                        placeholder="Cari lokasi...">
+                        placeholder="Search">
 
                     <button type="submit" class="btn btn-primary px-3">
                         <i class="fa fa-search"></i>

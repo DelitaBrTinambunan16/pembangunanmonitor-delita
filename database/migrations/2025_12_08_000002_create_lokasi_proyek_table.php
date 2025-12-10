@@ -14,6 +14,7 @@ return new class extends Migration
             $table->double('lat', 15, 8)->nullable();
             $table->double('lng', 15, 8)->nullable();
             $table->longText('geojson')->nullable();
+            $table->json('files')->nullable(); // simpan array nama file sebagai JSON
             $table->timestamps();
 
             $table->foreign('proyek_id')->references('proyek_id')->on('proyek')->onDelete('cascade');

@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="container mt-4">
-    <h2 class="mb-4">Daftar Progres Proyek</h2>
+    <h2 class="mb-4 text-center">Daftar Progres Proyek</h2>
+
 
     <div class="mb-3 text-end">
         <a href="{{ route('progres_proyek.create') }}" class="btn btn-primary">+ Tambah Progres</a>
@@ -17,7 +18,7 @@
         <div class="row g-2">
             <div class="col-md-3">
                 <select name="proyek_id" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Semua Proyek --</option>
+                    <option value="">Semua Proyek</option>
                     @foreach ($proyeks as $proyek)
                         <option value="{{ $proyek->proyek_id }}" {{ request('proyek_id') == $proyek->proyek_id ? 'selected' : '' }}>
                             {{ $proyek->nama_proyek }}

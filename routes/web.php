@@ -1,15 +1,16 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\WargaController;
+use App\Http\Controllers\ProyekController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KontraktorController;
 use App\Http\Controllers\LokasiProyekController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgresProyekController;
-use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\TahapanProyekController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\WargaController;
-use Illuminate\Support\Facades\Route;
 
 // AUTH
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -73,3 +74,11 @@ Route::middleware(['checkislogin'])->group(function () {
     Route::put('profile/{id}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('profile/{id}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+// Upload file
+Route::post('/proyek/{id}/upload-files', [ProyekController::class, 'uploadFiles'])->name('proyek.uploadFiles');
+
+// Hapus file
+Route::delete('/media/{id}', [MediaController::class, 'destroy'])->name('media.destroy');
+Route::delete('progres-proyek/file/{media_id}', [ProgresProyekController::class,'destroyFile'])->name('media.destroy');
+Route::delete('lokasi-proyek/{id}/file/{fileurl}', [LokasiProyekController::class,'destroyFile'])->name('lokasi_proyek.destroyFile');
+

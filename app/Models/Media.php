@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,9 +8,9 @@ class Media extends Model
 {
     use HasFactory;
 
-    protected $table = 'media';
+    protected $table      = 'media';
     protected $primaryKey = 'media_id';
-    public $timestamps = false; // jika tabel kamu tidak pakai created_at & updated_at
+    public $timestamps    = false; // jika tabel kamu tidak pakai created_at & updated_at
 
     protected $fillable = [
         'ref_table',
@@ -30,4 +29,11 @@ class Media extends Model
     {
         return $this->morphTo(null, 'ref_table', 'ref_id');
     }
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'ref_id')
+            ->where('ref_table', 'proyek')
+            ->orderBy('sort_order');
+    }
+
 }

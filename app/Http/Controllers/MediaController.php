@@ -1,47 +1,47 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Media;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class MediaController extends Controller
 {
-    /**
-     * Upload 1 atau banyak foto
-     */
     public function store(Request $request)
     {
         $request->validate([
             'ref_table' => 'required|string',
             'ref_id'    => 'required|integer',
             'files'     => 'required',
-            'files.*'   => 'image|mimes:jpg,jpeg,png,webp|max:2048'
+            'files.*'   => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:4096',
         ]);
 
-        // Pastikan input file adalah array, jika single file ubah jadi array
         $files = is_array($request->file('files'))
             ? $request->file('files')
             : [$request->file('files')];
 
         $uploadedFiles = [];
 
-        foreach ($files as $file) {
+        foreach ($files as $index => $file) {
 
-            // Simpan file ke storage/app/public/uploads
-            $path = $file->store('uploads', 'public');
+            // nama file asli
+            $originalName = $file->getClientOriginalName();
 
-            // Simpan metadata ke DB
+            // buat nama unik
+            $fileurl = time() . '_' . $index . '_' . $originalName;
+
+            // folder berdasarkan ref_table (contoh: proyek/, progres_proyek/, lokasi_proyek/)
+            $file->storeAs('uploads/' . $request->ref_table, $fileurl, 'public');
+
+            // simpan metadata (PAKAI FILE_NAME sesuai soal)
             $media = Media::create([
                 'ref_table'  => $request->ref_table,
                 'ref_id'     => $request->ref_id,
-                'file_url'   => 'storage/' . $path,
-                'caption'    => $request->caption ?? null,
+                'file_url'  => $fileurl,
+                'caption'    => $request->caption[$index] ?? null,
                 'mime_type'  => $file->getClientMimeType(),
                 'sort_order' => Media::where('ref_table', $request->ref_table)
-                                     ->where('ref_id', $request->ref_id)
-                                     ->count() + 1,
+                    ->where('ref_id', $request->ref_id)
+                    ->count() + 1,
             ]);
 
             $uploadedFiles[] = $media;
@@ -53,37 +53,27 @@ class MediaController extends Controller
         ]);
     }
 
-    /**
-     * Ambil semua foto berdasarkan ref_table & ref_id
-     */
     public function getByReference($table, $id)
     {
-        $media = Media::where('ref_table', $table)
-                      ->where('ref_id', $id)
-                      ->orderBy('sort_order')
-                      ->get();
-
-        return response()->json($media);
+        return Media::where('ref_table', $table)
+            ->where('ref_id', $id)
+            ->orderBy('sort_order')
+            ->get();
     }
 
-    /**
-     * Hapus media berdasarkan ID
-     */
-    public function destroy($media_id)
+    public function destroy($id)
     {
-        $media = Media::findOrFail($media_id);
+        $file = DB::table('media')->where('media_id', $id)->first();
 
-        // Path asli tanpa "storage/"
-        $storedPath = str_replace('storage/', '', $media->file_url);
-
-        // Hapus file fisik jika ada
-        if (Storage::disk('public')->exists($storedPath)) {
-            Storage::disk('public')->delete($storedPath);
+        if ($file) {
+            $path = public_path('uploads/' . $file->file_url);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+            DB::table('media')->where('media_id', $id)->delete();
         }
 
-        // Hapus record DB
-        $media->delete();
-
-        return response()->json(['message' => 'Media berhasil dihapus']);
+        return back()->with('success', 'File berhasil dihapus.');
     }
+
 }

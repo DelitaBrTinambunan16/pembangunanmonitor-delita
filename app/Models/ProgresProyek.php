@@ -23,6 +23,12 @@ class ProgresProyek extends Model
         return $this->belongsTo(TahapanProyek::class, 'tahap_id');
     }
 
+    // Relasi ke media
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'ref_id')->where('ref_table','progres_proyek');
+    }
+
     // Scope filter
     public function scopeFilter($query, $request, $filterableColumns)
     {

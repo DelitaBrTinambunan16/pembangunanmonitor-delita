@@ -12,17 +12,17 @@ class LokasiProyek extends Model
     protected $primaryKey = 'lokasi_id';
 
     protected $fillable = [
-        'proyek_id', 'lat', 'lng', 'geojson',
+        'proyek_id', 'lat', 'lng', 'geojson', 'files'
     ];
 
-// Relasi ke Proyek
+    // Relasi ke Proyek
     public function proyek()
     {
         return $this->belongsTo(Proyek::class, 'proyek_id', 'proyek_id');
     }
 
     // Scope filter
-    public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder
+    public function scopeFilter($query, $request, array $filterableColumns)
     {
         foreach ($filterableColumns as $column) {
             if ($request->filled($column)) {
@@ -33,7 +33,7 @@ class LokasiProyek extends Model
     }
 
     // Scope search
-    public function scopeSearch(Builder $query, $request, array $searchableColumns): Builder
+    public function scopeSearch($query, $request, array $searchableColumns)
     {
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request, $searchableColumns) {
@@ -44,5 +44,16 @@ class LokasiProyek extends Model
         }
         return $query;
     }
-}
 
+    // Ambil list file
+    public function getFilesAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
+    }
+
+    // Simpan list file sebagai JSON
+    public function setFilesAttribute($value)
+    {
+        $this->attributes['files'] = json_encode($value);
+    }
+}

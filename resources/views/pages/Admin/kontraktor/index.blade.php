@@ -33,7 +33,7 @@
             <div class="col-md-3">
                 <div class="input-group">
                     <input type="text" name="search" class="form-control" value="{{ request('search') }}"
-                        placeholder="Search...">
+                        placeholder="Search">
 
                     <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
                         <i class="fa fa-search"></i>
