@@ -30,7 +30,7 @@ class WargaController extends Controller
             ->search($request, $searchableColumns)
             ->simplePaginate(10);
 
-        return view('Pages.Admin.warga.index', compact('warga'));
+        return view('pages.admin.warga.index', compact('warga'));
     }
 
     /**
@@ -103,5 +103,5 @@ class WargaController extends Controller
         $warga->delete();
         return redirect()->route('warga.index')->with('success', 'Data warga berhasil dihapus!');
     }
-    
+
 }
