@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,7 @@ class Media extends Model
 
     protected $table      = 'media';
     protected $primaryKey = 'media_id';
-    public $timestamps    = false; // jika tabel kamu tidak pakai created_at & updated_at
+    public $timestamps    = false;
 
     protected $fillable = [
         'ref_table',
@@ -22,18 +23,25 @@ class Media extends Model
     ];
 
     /**
-     * OPTIONAL:
-     * Relasi polymorphic manual berdasarkan ref_table dan ref_id
+     * Placeholder global (1 file untuk semua entity)
      */
-    public function owner()
+    public static function placeholder()
     {
-        return $this->morphTo(null, 'ref_table', 'ref_id');
-    }
-    public function media()
-    {
-        return $this->hasMany(Media::class, 'ref_id')
-            ->where('ref_table', 'proyek')
-            ->orderBy('sort_order');
+        return self::where('ref_table', 'placeholder')
+            ->where('ref_id', 0)
+            ->first();
     }
 
+    /**
+     * Media entity atau fallback placeholder
+     */
+    public static function forEntityOrPlaceholder(string $refTable, int $refId)
+    {
+        $media = self::where('ref_table', $refTable)
+            ->where('ref_id', $refId)
+            ->orderBy('sort_order')
+            ->first();
+
+        return $media ?: self::placeholder();
+    }
 }

@@ -1,10 +1,11 @@
 @extends('layouts.admin.app')
 
 @section('content')
-<div class="container">
+<div class="container" style="max-width: 600px;">
 
-    <h3>Edit Profile</h3>
+    <h3 class="mb-4">Edit Profile</h3>
 
+    {{-- Alert sukses --}}
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -14,17 +15,19 @@
         @csrf
         @method('PUT')
 
+        {{-- Foto Profil --}}
         <div class="mb-3">
-            <label>Foto Profil</label><br>
+            <label class="form-label fw-bold">Foto Profil</label><br>
 
-            @if ($user->profile_picture && file_exists(storage_path('app/public/' . $user->profile_picture)))
-                <img src="{{ asset('storage/' . $user->profile_picture) }}"
-                     width="120" height="120" class="rounded mb-2" style="object-fit:cover; border:3px solid #ddd;">
-            @else
-                <img src="https://via.placeholder.com/120"
-                     width="120" height="120" class="rounded mb-2" alt="Belum ada foto">
-            @endif
+            {{-- FOTO ADA? tampilkan. Kalau TIDAK ADA → tampilkan placeholder --}}
+            <img src="{{ $user->profile_picture
+                        ? asset('storage/' . $user->profile_picture)
+                        : asset('asset-admin/img/placeholder-user.png') }}"
+                 width="120" height="120"
+                 class="rounded mb-2"
+                 style="object-fit: cover; border: 3px solid #ddd;">
 
+            {{-- Input Upload Baru --}}
             <input type="file" name="profile_picture" class="form-control mt-2">
 
             @error('profile_picture')
@@ -32,15 +35,15 @@
             @enderror
         </div>
 
-        <button class="btn btn-primary">Update</button>
+        <button class="btn btn-primary w-100">Simpan Perubahan</button>
     </form>
 
-    {{-- Form Delete --}}
+    {{-- Form Hapus Foto --}}
     @if ($user->profile_picture)
         <form action="{{ route('profile.destroy', $user->id) }}" method="POST" class="mt-3">
             @csrf
             @method('DELETE')
-            <button class="btn btn-danger">Hapus Foto Profil</button>
+            <button class="btn btn-danger w-100">Hapus Foto Profil</button>
         </form>
     @endif
 

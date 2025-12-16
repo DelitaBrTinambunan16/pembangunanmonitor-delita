@@ -1,66 +1,50 @@
 @extends('layouts.admin.app')
 
 @section('content')
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Detail Tahapan Proyek</h2>
+    <div class="container mt-4">
 
-    <div class="mb-4">
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Proyek</div>
-            <div class="col-md-9">: {{ $tahapan->proyek->nama_proyek }}</div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Nama Tahap</div>
-            <div class="col-md-9">: {{ $tahapan->nama_tahap }}</div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Target (%)</div>
-            <div class="col-md-9">: {{ $tahapan->target_persen }}%</div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Tanggal Mulai</div>
-            <div class="col-md-9">: {{ \Carbon\Carbon::parse($tahapan->tgl_mulai)->format('d M Y') }}</div>
-        </div>
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Tanggal Selesai</div>
-            <div class="col-md-9">: {{ \Carbon\Carbon::parse($tahapan->tgl_selesai)->format('d M Y') }}</div>
+        <h4 class="mb-4 text-center fw-bold">Detail Tahapan Proyek</h4>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6"><strong>Proyek</strong><br>{{ $tahapan->proyek->nama_proyek }}</div>
+            <div class="col-md-6"><strong>Nama Tahap</strong><br>{{ $tahapan->nama_tahap }}</div>
+            <div class="col-md-6"><strong>Target</strong><br>{{ $tahapan->target_persen }}%</div>
+            <div class="col-md-6"><strong>Mulai</strong><br>{{ \Carbon\Carbon::parse($tahapan->tgl_mulai)->format('d M Y') }}
+            </div>
+            <div class="col-md-6">
+                <strong>Selesai</strong><br>{{ \Carbon\Carbon::parse($tahapan->tgl_selesai)->format('d M Y') }}</div>
         </div>
 
-        <div class="mt-4 text-end">
-            <a href="{{ route('tahapan.index') }}" class="btn btn-secondary">Kembali</a>
-            <a href="{{ route('tahapan.edit', $tahapan->tahap_id) }}" class="btn btn-warning">Edit</a>
-        </div>
-    </div>
+        <h6 class="mb-3">Dokumen Tahapan</h6>
 
-    <!-- Media Tahapan -->
-    <div>
-        <h5 class="mb-3">Dokumen Tahapan</h5>
-        @if($tahapan->media->count() > 0)
+        @if ($tahapan->media->count())
             <div class="row">
-                @foreach($tahapan->media as $media)
-                    <div class="col-md-3 mb-3 text-center">
-                        @if(in_array(pathinfo($media->file_url, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp']))
-                            <img src="{{ asset('storage/uploads/' . $media->ref_table . '/' . $media->file_url) }}" class="img-fluid rounded mb-1">
+                @foreach ($tahapan->media as $media)
+                    @php
+                        $isImage = Str::startsWith($media->mime_type, 'image');
+                        $path = asset('storage/uploads/' . $media->ref_table . '/' . $media->file_url);
+                    @endphp
+                    <div class="col-6 col-md-3 mb-3 text-center">
+                        @if ($isImage)
+                            <img src="{{ $path }}" class="img-fluid rounded">
                         @else
-                            <a href="{{ asset('storage/uploads/' . $media->ref_table . '/' . $media->file_url) }}" target="_blank">
-                                <i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>
-                                <p class="mb-0">{{ $media->file_url }}</p>
+                            <a href="{{ $path }}" target="_blank">
+                                <i class="bi bi-file-earmark-text fs-1"></i>
+                                <div class="small text-truncate">{{ $media->file_url }}</div>
                             </a>
                         @endif
-                        @if($media->caption)
-                            <small>{{ $media->caption }}</small>
-                        @endif
-                        <form action="{{ route('media.destroy', $media->media_id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger mt-1" onclick="return confirm('Yakin ingin hapus file ini?')">Hapus</button>
-                        </form>
                     </div>
                 @endforeach
             </div>
         @else
-            <p class="text-muted">Belum ada media untuk tahapan ini.</p>
+            <div class="d-flex justify-content-center py-4">
+                <div class="text-center opacity-75">
+                    <img src="{{ asset('asset-admin/img/default-avatar.png') }}" width="80">
+                    <div class="text-muted small">Belum ada dokumen tahapan</div>
+                </div>
+            </div>
         @endif
+
+        <a href="{{ route('tahapan.index') }}" class="btn btn-secondary mt-3">Kembali</a>
     </div>
-</div>
 @endsection

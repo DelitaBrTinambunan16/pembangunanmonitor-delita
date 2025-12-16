@@ -1,136 +1,155 @@
 @extends('layouts.admin.app')
 
 @section('content')
+<div class="container mt-4">
 
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Daftar User</h2>
+    <h2 class="mb-4 text-center">Detail User</h2>
 
+    {{-- TAMBAH USER --}}
     <div class="mb-3 text-end">
-        <a href="{{ route('user.create') }}" class="btn btn-primary">+ Tambah User</a>
+        <a href="{{ route('user.create') }}" class="btn btn-primary">
+            + Tambah User
+        </a>
     </div>
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    {{-- FILTER --}}
+    {{-- FILTER + SEARCH --}}
     <form method="GET" action="{{ route('user.index') }}" class="mb-3">
-        <div class="row">
+        <div class="row g-2">
 
-            {{-- FILTER EMAIL --}}
             <div class="col-md-3">
-                <input type="text" name="email" class="form-control"
+                <input type="text" name="email"
+                       class="form-control"
                        placeholder="Cari Email..."
-                       value="{{ request('email') }}"
-                       onchange="this.form.submit()">
+                       value="{{ request('email') }}">
             </div>
 
-            {{-- SEARCH --}}
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="input-group">
-
-                    <input type="text" name="search" class="form-control"
-                           value="{{ request('search') }}" placeholder="Search">
-
-                    <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
-                        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"
-                             xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd"
-                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-
-                    {{-- CLEAR --}}
-                    @if (request('search'))
-                        <a href="{{ route('user.index', array_merge(request()->except('search'))) }}"
-                           class="btn btn-secondary text-white">
-                            Clear
-                        </a>
-                    @endif
-
+                    <input type="text" name="search"
+                           class="form-control"
+                           placeholder="Search"
+                           value="{{ request('search') }}">
+                    <button class="btn btn-primary">Cari</button>
                 </div>
             </div>
 
         </div>
     </form>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>No</th>
-                <th>Foto</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Tanggal Dibuat</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
+    {{-- TABLE --}}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle text-center">
 
-        <tbody>
-            @forelse ($users as $user)
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <th width="60">No</th>
+                    <th width="80">Foto</th>
+                    <th width="180">Nama</th>
+                    <th width="260">Email</th>
+                    <th width="120">Role</th>
+                    <th width="120">Dibuat</th>
+                    <th width="160">Aksi</th>
+                </tr>
+            </thead>
 
-                    {{-- FOTO USER --}}
+            <tbody>
+            @forelse ($users as $index => $user)
+
+                @php
+                    $fotoUser = \App\Models\Media::where('ref_table', 'users')
+                        ->where('ref_id', $user->id)
+                        ->first();
+
+                    $foto = $fotoUser
+                        ? asset($fotoUser->file_url)
+                        : asset('asset-admin/img/default-avatar.png');
+
+                    $badgeRole = match ($user->role) {
+                        'admin' => 'bg-danger',
+                        'staff' => 'bg-warning',
+                        default => 'bg-primary',
+                    };
+                @endphp
+
+                <tr>
+                    <td>{{ $users->firstItem() + $index }}</td>
+
+                    {{-- FOTO --}}
                     <td>
-                        @php
-                            // 1. Foto dari tabel media
-                            $mediaFoto = $user->media
-                                ? asset($user->media->file_url)
-                                : null;
-
-                            // 2. Foto dari kolom profile_picture
-                            $profileFoto = $user->profile_picture
-                                ? asset('storage/' . $user->profile_picture)
-                                : null;
-
-                            // 3. Default
-                            $defaultFoto = asset('assets/default-avatar.png');
-
-                            // FINAL FOTO (prioritas: media -> profile -> default)
-                            $foto = $mediaFoto ?? $profileFoto ?? $defaultFoto;
-                        @endphp
-
-                        <img src="{{ $foto }}" alt="Avatar"
-                            class="rounded-circle"
-                            width="50" height="50"
-                            style="object-fit: cover;">
+                        <img src="{{ $foto }}"
+                             class="rounded-circle"
+                             width="40" height="40"
+                             style="object-fit:cover">
                     </td>
 
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->role }}</td>
+                    {{-- NAMA --}}
+                    <td class="text-start">{{ $user->name }}</td>
+
+                    {{-- EMAIL --}}
+                    <td class="text-start">
+                        <div class="text-truncate" style="max-width:260px;">
+                            {{ $user->email }}
+                        </div>
+                    </td>
+
+                    {{-- ROLE --}}
+                    <td>
+                        <span class="badge {{ $badgeRole }} px-3 py-1 text-capitalize">
+                            {{ $user->role }}
+                        </span>
+                    </td>
+
+                    {{-- DIBUAT --}}
                     <td>{{ $user->created_at->format('d-m-Y') }}</td>
 
+                    {{-- AKSI --}}
                     <td>
-                        <a href="{{ route('user.show', $user->id) }}" class="btn btn-info btn-sm">Lihat</a>
-                        <a href="{{ route('user.edit', $user->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <div class="d-flex justify-content-center gap-1">
 
-                        <form action="{{ route('user.destroy', $user->id) }}"
-                              method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm"
-                                onclick="return confirm('Yakin ingin menghapus user ini?')">
-                                Hapus
-                            </button>
-                        </form>
+                            <a href="{{ route('user.show', $user->id) }}"
+                               class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a href="{{ route('user.edit', $user->id) }}"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <form action="{{ route('user.destroy', $user->id) }}"
+                                  method="POST"
+                                  onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
                     </td>
                 </tr>
+
             @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted">Belum ada data user</td>
+                    <td colspan="7" class="text-center text-muted">
+                        Belum ada data user
+                    </td>
                 </tr>
             @endforelse
-        </tbody>
-    </table>
+            </tbody>
 
+        </table>
+    </div>
+
+    {{-- PAGINATION --}}
     <div class="mt-3">
         {{ $users->links('pagination::simple-bootstrap-5') }}
     </div>
 
 </div>
-
 @endsection

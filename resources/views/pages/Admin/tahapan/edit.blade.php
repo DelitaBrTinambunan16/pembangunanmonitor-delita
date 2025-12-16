@@ -4,15 +4,17 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center">Edit Tahapan Proyek</h2>
 
-    <form action="{{ route('tahapan.update', $tahapan->tahap_id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('tahapan.update', $tahapan->tahap_id) }}"
+          method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
-            <label>Proyek</label>
-            <select name="proyek_id" class="form-control" required>
+            <label class="fw-bold">Proyek</label>
+            <select name="proyek_id" class="form-select" required>
                 @foreach ($proyek as $p)
-                    <option value="{{ $p->proyek_id }}" {{ old('proyek_id', $tahapan->proyek_id) == $p->proyek_id ? 'selected' : '' }}>
+                    <option value="{{ $p->proyek_id }}"
+                        {{ old('proyek_id', $tahapan->proyek_id) == $p->proyek_id ? 'selected' : '' }}>
                         {{ $p->nama_proyek }}
                     </option>
                 @endforeach
@@ -20,11 +22,11 @@
         </div>
 
         <div class="mb-3">
-            <label>Nama Tahap</label>
+            <label class="fw-bold">Nama Tahap</label>
             <select name="nama_tahap" class="form-select" required>
-                <option value="" disabled>-- Pilih Tahap --</option>
                 @foreach ($pilihanTahap as $item)
-                    <option value="{{ $item }}" {{ old('nama_tahap', $tahapan->nama_tahap) == $item ? 'selected' : '' }}>
+                    <option value="{{ $item }}"
+                        {{ old('nama_tahap', $tahapan->nama_tahap) == $item ? 'selected' : '' }}>
                         {{ $item }}
                     </option>
                 @endforeach
@@ -32,51 +34,80 @@
         </div>
 
         <div class="mb-3">
-            <label>Target (%)</label>
-            <input type="number" name="target_persen" class="form-control" value="{{ old('target_persen', $tahapan->target_persen) }}" required>
+            <label class="fw-bold">Target (%)</label>
+            <input type="number" name="target_persen" class="form-control"
+                   value="{{ old('target_persen', $tahapan->target_persen) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>Tanggal Mulai</label>
-            <input type="date" name="tgl_mulai" class="form-control" value="{{ old('tgl_mulai', $tahapan->tgl_mulai) }}" required>
+            <label class="fw-bold">Tanggal Mulai</label>
+            <input type="date" name="tgl_mulai" class="form-control"
+                   value="{{ old('tgl_mulai', $tahapan->tgl_mulai) }}" required>
         </div>
 
         <div class="mb-3">
-            <label>Tanggal Selesai</label>
-            <input type="date" name="tgl_selesai" class="form-control" value="{{ old('tgl_selesai', $tahapan->tgl_selesai) }}" required>
+            <label class="fw-bold">Tanggal Selesai</label>
+            <input type="date" name="tgl_selesai" class="form-control"
+                   value="{{ old('tgl_selesai', $tahapan->tgl_selesai) }}" required>
         </div>
 
-        <!-- Upload File Baru -->
-        <div class="mb-3">
-            <label>Upload File Baru</label>
-            <input type="file" name="files[]" class="form-control" multiple>
-            <small class="text-muted">Tambahkan file baru. File lama tidak akan dihapus.</small>
+        {{-- UPLOAD FILE --}}
+        <div class="mb-4">
+            <label class="fw-bold">Upload Dokumen Baru</label>
+            <input type="file" name="files[]" multiple class="form-control">
         </div>
 
-        <!-- File Lama -->
-        @if($tahapan->media->count() > 0)
-            <div class="mb-3">
-                <label>File Lama</label>
-                <ul>
-                    @foreach($tahapan->media as $media)
-                        <li>
-                            <a href="{{ asset('storage/uploads/' . $media->ref_table . '/' . $media->file_url) }}" target="_blank">
-                                {{ $media->file_url }}
+        {{-- ================= DOKUMEN TAHAPAN ================= --}}
+        <h5 class="mb-3">Dokumen Tahapan</h5>
+
+        @if($tahapan->media->count())
+            <div class="row">
+                @foreach($tahapan->media as $media)
+                    @php
+                        $isImage = Str::startsWith($media->mime_type,'image');
+                        $path = asset('storage/uploads/'.$media->ref_table.'/'.$media->file_url);
+                    @endphp
+
+                    <div class="col-md-3 text-center mb-3">
+                        @if($isImage)
+                            <img src="{{ $path }}"
+                                 class="img-fluid rounded mb-2"
+                                 style="max-height:120px;object-fit:cover;width:100%">
+                        @else
+                            <a href="{{ $path }}" target="_blank">
+                                <i class="bi bi-file-earmark-text fs-1"></i>
+                                <p class="small text-truncate">{{ $media->file_url }}</p>
                             </a>
-                            <form action="{{ route('media.destroy', $media->media_id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin hapus file ini?')">Hapus</button>
-                            </form>
-                        </li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                        @endif
 
-        <div class="text-end">
+                        <form action="{{ route('media.destroy',$media->media_id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Yakin hapus file ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm w-100">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+  @else
+        {{-- PLACEHOLDER  --}}
+        <div class="d-flex justify-content-center">
+            <div class="text-center opacity-75">
+                <img src="{{ asset('asset-admin/img/default-avatar.png') }}"
+                     width="80" class="mb-2">
+                <div class="text-muted small">
+                    Belum ada dokumen tahapan
+                </div>
+            </div>
+        </div>
+    @endif
+
+        <div class="text-end mt-4">
             <a href="{{ route('tahapan.index') }}" class="btn btn-secondary">Kembali</a>
-            <button type="submit" class="btn btn-success">Perbarui</button>
+            <button class="btn btn-success">Perbarui</button>
         </div>
     </form>
 </div>

@@ -103,4 +103,5 @@ class WargaController extends Controller
         $warga->delete();
         return redirect()->route('warga.index')->with('success', 'Data warga berhasil dihapus!');
     }
+    
 }

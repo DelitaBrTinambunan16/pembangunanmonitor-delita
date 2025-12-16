@@ -21,5 +21,5 @@ class CheckIsLogin
             return redirect()->route('login')->withErrors('Silahkan login terlebih dahulu!');
         }
         return $next($request);
-    }
+    }        
 }

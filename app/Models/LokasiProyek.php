@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Media;
 
 class LokasiProyek extends Model
 {
@@ -12,8 +14,15 @@ class LokasiProyek extends Model
     protected $primaryKey = 'lokasi_id';
 
     protected $fillable = [
-        'proyek_id', 'lat', 'lng', 'geojson', 'files'
+        'proyek_id',
+        'lat',
+        'lng',
+        'geojson',
     ];
+
+    // ==================================================
+    // RELASI
+    // ==================================================
 
     // Relasi ke Proyek
     public function proyek()
@@ -21,7 +30,17 @@ class LokasiProyek extends Model
         return $this->belongsTo(Proyek::class, 'proyek_id', 'proyek_id');
     }
 
-    // Scope filter
+    // 🔥 RELASI MEDIA (SAMA DENGAN PROYEK & PROGRES)
+    public function media()
+    {
+        return $this->hasMany(Media::class, 'ref_id', 'lokasi_id')
+            ->where('ref_table', 'lokasi_proyek')
+            ->orderBy('sort_order');
+    }
+
+    // ==================================================
+    // SCOPE FILTER
+    // ==================================================
     public function scopeFilter($query, $request, array $filterableColumns)
     {
         foreach ($filterableColumns as $column) {
@@ -32,7 +51,9 @@ class LokasiProyek extends Model
         return $query;
     }
 
-    // Scope search
+    // ==================================================
+    // SCOPE SEARCH
+    // ==================================================
     public function scopeSearch($query, $request, array $searchableColumns)
     {
         if ($request->filled('search')) {
@@ -43,17 +64,5 @@ class LokasiProyek extends Model
             });
         }
         return $query;
-    }
-
-    // Ambil list file
-    public function getFilesAttribute($value)
-    {
-        return $value ? json_decode($value, true) : [];
-    }
-
-    // Simpan list file sebagai JSON
-    public function setFilesAttribute($value)
-    {
-        $this->attributes['files'] = json_encode($value);
     }
 }

@@ -15,7 +15,7 @@ class ProgresProyekController extends Controller
         $filterableColumns = ['proyek_id','tahap_id'];
         $searchableColumns = ['catatan'];
 
-        $progres = ProgresProyek::with(['proyek','tahap','media'])
+        $progres = ProgresProyek::with(['proyek','tahapan','media'])
             ->filter($request, $filterableColumns)
             ->search($request, $searchableColumns)
             ->simplePaginate(10);
@@ -132,7 +132,7 @@ class ProgresProyekController extends Controller
 
     public function show($id)
     {
-        $item = ProgresProyek::with('media','proyek','tahap')->findOrFail($id);
+        $item = ProgresProyek::with('media','proyek','tahapan')->findOrFail($id);
         return view('pages.admin.progres_proyek.show', compact('item'));
     }
 }

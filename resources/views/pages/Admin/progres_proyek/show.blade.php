@@ -1,79 +1,53 @@
 @extends('layouts.admin.app')
 
 @section('content')
-<div class="container mt-5">
-    <h2 class="mb-4 text-center">Detail Progres Proyek</h2>
+    <div class="container mt-4">
 
-    <div class="mb-4">
-        <!-- Detail Progres -->
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Proyek</div>
-            <div class="col-md-9">: {{ $item->proyek->nama_proyek ?? '-' }}</div>
+        <h4 class="mb-4 text-center fw-bold">Detail Progres Proyek</h4>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6"><strong>Proyek</strong><br>{{ $item->proyek->nama_proyek ?? '-' }}</div>
+            <div class="col-md-6"><strong>Tahap</strong><br>{{ $item->tahapan->nama_tahap ?? '-' }}</div>
+            <div class="col-md-6"><strong>Realisasi</strong><br>{{ $item->persen_real }}%</div>
+            <div class="col-md-6">
+                <strong>Tanggal</strong><br>{{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y') : '-' }}
+            </div>
+            <div class="col-md-12"><strong>Catatan</strong><br>{{ $item->catatan ?? '-' }}</div>
         </div>
 
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Tahap</div>
-            <div class="col-md-9">: {{ $item->tahap->nama_tahap ?? '-' }}</div>
-        </div>
+        <h6 class="mb-3">Dokumen Progres</h6>
 
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Persen Real (%)</div>
-            <div class="col-md-9">: {{ $item->persen_real ?? 0 }}%</div>
-        </div>
+        @php
+            $mediaList = \App\Models\Media::where('ref_table', 'progres_proyek')
+                ->where('ref_id', $item->progres_id)
+                ->get();
+        @endphp
 
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Tanggal</div>
-            <div class="col-md-9">: {{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y') : '-' }}</div>
-        </div>
-
-        <div class="row mb-2">
-            <div class="col-md-3 font-weight-bold">Catatan</div>
-            <div class="col-md-9">: {{ $item->catatan ?? '-' }}</div>
-        </div>
-
-        <div class="mt-4 text-end">
-            <a href="{{ route('progres_proyek.index') }}" class="btn btn-secondary">Kembali</a>
-            <a href="{{ route('progres_proyek.edit', $item->progres_id) }}" class="btn btn-warning">Edit</a>
-        </div>
-    </div>
-
-    <!-- Media Progres -->
-    <div>
-        <h5 class="mb-3">Dokumen / Media Progres</h5>
-        @if($item->media->count() > 0)
+        @if ($mediaList->count())
             <div class="row">
-                @foreach($item->media as $media)
+                @foreach ($mediaList as $media)
+                    @php $isImage = Str::startsWith($media->mime_type,'image'); @endphp
                     <div class="col-6 col-md-3 mb-3 text-center">
-                        @php
-                            $extension = strtolower(pathinfo($media->file_url, PATHINFO_EXTENSION));
-                        @endphp
-
-                        @if(in_array($extension, ['jpg','jpeg','png','webp']))
-                            <img src="{{ asset('storage/uploads/progres_proyek/' . $media->file_url) }}"
-                                 class="img-fluid rounded mb-1"
-                                 alt="{{ $media->caption ?? '' }}">
+                        @if ($isImage)
+                            <img src="{{ asset($media->file_url) }}" class="img-fluid rounded">
                         @else
-                            <a href="{{ asset('storage/uploads/progres_proyek/' . $media->file_url) }}" target="_blank">
-                                <i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i>
-                                <p class="mb-0 text-truncate" style="max-width: 100%;">{{ $media->file_url }}</p>
+                            <a href="{{ asset($media->file_url) }}" target="_blank">
+                                <i class="bi bi-file-earmark-text fs-1"></i>
+                                <div class="small text-truncate">{{ $media->caption ?? 'File' }}</div>
                             </a>
                         @endif
-
-                        @if($media->caption)
-                            <small>{{ $media->caption }}</small>
-                        @endif
-
-                        <form action="{{ route('media.destroy', $media->media_id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-sm btn-danger mt-1" onclick="return confirm('Yakin ingin hapus file ini?')">Hapus</button>
-                        </form>
                     </div>
                 @endforeach
             </div>
         @else
-            <p class="text-muted">Belum ada media untuk progres ini.</p>
+            <div class="d-flex justify-content-center py-4">
+                <div class="text-center opacity-75">
+                    <img src="{{ asset('asset-admin/img/default-avatar.png') }}" width="80">
+                    <div class="text-muted small">Belum ada dokumen progres</div>
+                </div>
+            </div>
         @endif
+
+        <a href="{{ route('progres_proyek.index') }}" class="btn btn-secondary mt-3">Kembali</a>
     </div>
-</div>
 @endsection

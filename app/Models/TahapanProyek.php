@@ -28,12 +28,13 @@ class TahapanProyek extends Model
     }
 
     // Relasi ke media (polymorphic manual)
-    public function media()
-    {
-        return $this->hasMany(\App\Models\Media::class, 'ref_id')
-                    ->where('ref_table', 'tahapan')
-                    ->orderBy('sort_order');
-    }
+public function media()
+{
+    return $this->hasMany(Media::class, 'ref_id', 'tahap_id')
+                ->where('ref_table', 'tahapan')
+                ->orderBy('sort_order');
+}
+
 
     // Scope filter
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder

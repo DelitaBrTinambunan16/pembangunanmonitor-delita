@@ -8,78 +8,121 @@
         @csrf
         @method('PUT')
 
-        {{-- Info Proyek --}}
+        {{-- ================= INFO PROYEK ================= --}}
         <div class="mb-3">
             <label>Kode Proyek</label>
-            <input type="text" name="kode_proyek" class="form-control" value="{{ $proyek->kode_proyek }}" required>
+            <input type="text" name="kode_proyek" class="form-control"
+                   value="{{ $proyek->kode_proyek }}" required>
         </div>
+
         <div class="mb-3">
             <label>Nama Proyek</label>
-            <input type="text" name="nama_proyek" class="form-control" value="{{ $proyek->nama_proyek }}" required>
+            <input type="text" name="nama_proyek" class="form-control"
+                   value="{{ $proyek->nama_proyek }}" required>
         </div>
+
         <div class="mb-3">
             <label>Tahun</label>
-            <input type="number" name="tahun" class="form-control" value="{{ $proyek->tahun }}" required>
+            <input type="number" name="tahun" class="form-control"
+                   value="{{ $proyek->tahun }}" required>
         </div>
+
         <div class="mb-3">
             <label>Lokasi</label>
-            <input type="text" name="lokasi" class="form-control" value="{{ $proyek->lokasi }}" required>
+            <input type="text" name="lokasi" class="form-control"
+                   value="{{ $proyek->lokasi }}" required>
         </div>
+
         <div class="mb-3">
             <label>Anggaran (Rp)</label>
-            <input type="number" step="0.01" name="anggaran" class="form-control" value="{{ $proyek->anggaran }}" required>
+            <input type="number" step="0.01" name="anggaran" class="form-control"
+                   value="{{ $proyek->anggaran }}" required>
         </div>
+
         <div class="mb-3">
             <label>Sumber Dana</label>
-            <input type="text" name="sumber_dana" class="form-control" value="{{ $proyek->sumber_dana }}" required>
+            <input type="text" name="sumber_dana" class="form-control"
+                   value="{{ $proyek->sumber_dana }}" required>
         </div>
+
         <div class="mb-3">
             <label>Deskripsi</label>
             <textarea name="deskripsi" class="form-control" rows="4">{{ $proyek->deskripsi }}</textarea>
         </div>
 
-        {{-- Upload File Pendukung Baru --}}
+        {{-- ================= UPLOAD FILE BARU ================= --}}
         <div class="mb-3">
-            <label>Upload File</label>
+            <label>Upload File Pendukung</label>
             <input type="file" name="files[]" class="form-control" multiple>
             <input type="hidden" name="ref_table" value="proyek">
             <input type="hidden" name="ref_id" value="{{ $proyek->proyek_id }}">
+            <small class="text-muted">Boleh upload gambar / dokumen (PDF, DOC, dll)</small>
         </div>
 
-        {{-- File yang sudah ada --}}
-        <div class="mb-3">
-            <label>File Pendukung Saat Ini:</label><br>
-            @php
-                $files = DB::table('media')
-                    ->where('ref_table', 'proyek')
-                    ->where('ref_id', $proyek->proyek_id)
-                    ->get();
-            @endphp
+        {{-- ================= FILE SAAT INI ================= --}}
+        <h5 class="fw-bold mt-4 mb-2">Dokumen Proyek</h5>
 
-            @foreach ($files as $file)
-                @php $ext = pathinfo($file->file_url, PATHINFO_EXTENSION); @endphp
-                <div class="mb-2 d-flex align-items-center gap-2">
-                    @if(in_array(strtolower($ext), ['jpg','jpeg','png','gif']))
-                        <img src="{{ asset('uploads/' . $file->file_url) }}" width="100" class="img-thumbnail">
-                    @else
-                        <span>{{ $file->file_url
+        @php
+            $files = \App\Models\Media::where('ref_table', 'proyek')
+                ->where('ref_id', $proyek->proyek_id)
+                ->orderBy('sort_order')
+                ->get();
+        @endphp
 
-                        }}</span>
-                    @endif
+        @if ($files->count())
+            <div class="row">
+                @foreach ($files as $file)
+                    @php
+                        $isImage = Str::startsWith($file->mime_type, 'image');
+                        $fileUrl = asset($file->file_url);
+                    @endphp
 
-                    <form action="{{ route('media.destroy', $file->media_id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus file ini?')">Hapus</button>
-                    </form>
+                    <div class="col-md-3 mb-3 text-center">
+                        @if ($isImage)
+                            <img src="{{ $fileUrl }}"
+                                 class="img-fluid border rounded mb-2"
+                                 style="max-height:140px; object-fit:cover;">
+                        @else
+                            <a href="{{ $fileUrl }}" target="_blank"
+                               class="d-block p-2 border rounded">
+                                <i class="bi bi-file-earmark-text fs-1"></i>
+                                <p class="small mb-0">
+                                    {{ $file->caption ?? 'Lihat File' }}
+                                </p>
+                            </a>
+                        @endif
+
+                        <form action="{{ route('media.destroy', $file->media_id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Yakin hapus file ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm w-100 mt-1">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+  @else
+        {{-- PLACEHOLDER  --}}
+        <div class="d-flex justify-content-center">
+            <div class="text-center opacity-75">
+                <img src="{{ asset('asset-admin/img/default-avatar.png') }}"
+                     width="80" class="mb-2">
+                <div class="text-muted small">
+                    Belum ada dokumen Proyek
                 </div>
-            @endforeach
+            </div>
         </div>
+    @endif
 
-        <div class="text-end">
+        {{-- ================= AKSI ================= --}}
+        <div class="text-end mt-4">
             <a href="{{ route('proyek.index') }}" class="btn btn-secondary">Kembali</a>
             <button type="submit" class="btn btn-success">Update</button>
         </div>
+
     </form>
 </div>
 @endsection

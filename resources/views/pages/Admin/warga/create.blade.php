@@ -1,13 +1,16 @@
 @extends('layouts.admin.app')
 
 @section('content')
-
 <body>
     <div class="container mt-5">
         <h2 class="mb-4 text-center">Tambah Data Warga</h2>
 
+        {{-- Hanya admin & staff --}}
+        @if(in_array(auth()->user()->role, ['admin', 'staff']))
+
         <form action="{{ route('warga.store') }}" method="POST">
             @csrf
+
             <div class="mb-3">
                 <label>No KTP</label>
                 <input type="text" name="no_ktp" class="form-control" required>
@@ -52,6 +55,11 @@
                 <button type="submit" class="btn btn-success">Simpan</button>
             </div>
         </form>
+
+        @else
+            <div class="alert alert-danger">Anda tidak memiliki akses untuk menambah data.</div>
+        @endif
+
     </div>
 </body>
 @endsection

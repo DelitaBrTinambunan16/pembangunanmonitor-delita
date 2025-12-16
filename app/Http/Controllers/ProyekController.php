@@ -46,7 +46,6 @@ class ProyekController extends Controller
             'kode_proyek' => 'required',
             'nama_proyek' => 'required',
             'tahun' => 'required',
-            'lokasi' => 'required',
             'anggaran' => 'required',
             'sumber_dana' => 'required',
             'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
@@ -57,7 +56,6 @@ class ProyekController extends Controller
             'kode_proyek' => $request->kode_proyek,
             'nama_proyek' => $request->nama_proyek,
             'tahun' => $request->tahun,
-            'lokasi' => $request->lokasi,
             'anggaran' => $request->anggaran,
             'sumber_dana' => $request->sumber_dana,
             'deskripsi' => $request->deskripsi,
@@ -86,15 +84,19 @@ class ProyekController extends Controller
         return redirect()->route('proyek.index')->with('success', 'Proyek berhasil ditambahkan!');
     }
 
-    public function show($id)
-    {
-        $proyek = Proyek::findOrFail($id);
-        $media  = Media::where('ref_table', 'proyek')
-                        ->where('ref_id', $id)
-                        ->get();
+public function show($id)
+{
+    $proyek = Proyek::with([
+        'kontraktor',     // relasi kontraktor
+        'tahapan',        // relasi tahapan
+        'progres.tahapan',   // progres + relasi ke nama tahapan
+        'lokasiProyek',         // relasi lokasi
+        'media'            // dokumen proyek
+    ])->findOrFail($id);
 
-        return view('pages.admin.proyek.show', compact('proyek', 'media'));
-    }
+    return view('pages.admin.proyek.show', compact('proyek'));
+}
+
 
     public function edit($id)
     {
@@ -109,7 +111,6 @@ class ProyekController extends Controller
             'kode_proyek' => 'required',
             'nama_proyek' => 'required',
             'tahun' => 'required',
-            'lokasi' => 'required',
             'anggaran' => 'required',
             'sumber_dana' => 'required',
             'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
@@ -122,7 +123,6 @@ class ProyekController extends Controller
             'kode_proyek' => $request->kode_proyek,
             'nama_proyek' => $request->nama_proyek,
             'tahun' => $request->tahun,
-            'lokasi' => $request->lokasi,
             'anggaran' => $request->anggaran,
             'sumber_dana' => $request->sumber_dana,
             'deskripsi' => $request->deskripsi,

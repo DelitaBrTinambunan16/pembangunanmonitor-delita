@@ -1,41 +1,52 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Proyek;
 use App\Models\User;
 use App\Models\Warga;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Tampilkan halaman dashboard dengan data dari database.
-     */
     public function index()
     {
-        // Kalau belum login, arahkan ke halaman login
-        if (! Auth::check()) {
-            return redirect()->route('login')->withErrors('Silahkan login terlebih dahulu.');
+        // Proteksi login
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->withErrors('Silakan login terlebih dahulu.');
         }
 
-        // Hitung total data di setiap tabel
+        // ================= STATISTIK UTAMA =================
         $totalProyek = Proyek::count();
         $totalUser   = User::count();
         $totalWarga  = Warga::count();
 
-        // Ambil 5 proyek terbaru
-        $proyekAktif = Proyek::orderBy('created_at', 'desc')->take(5)->get();
+        // ================= PROYEK TERBARU =================
+        $proyekAktif = Proyek::orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
-        // Data per tahun untuk Chart
+        // ================= GRAFIK PROYEK PER TAHUN =================
+        // hasil: Collection [tahun => jumlah]
         $proyekPerTahun = Proyek::selectRaw('tahun, COUNT(*) as jumlah')
             ->groupBy('tahun')
-            ->orderBy('tahun', 'asc')
-            ->pluck('jumlah', 'tahun')
-            ->toArray();
+            ->orderBy('tahun')
+            ->pluck('jumlah', 'tahun');
+
+        // ================= GRAFIK SUMBER DANA =================
+        // hasil: Collection [sumber_dana => jumlah]
+        $sumberDana = Proyek::selectRaw('sumber_dana, COUNT(*) as jumlah')
+            ->groupBy('sumber_dana')
+            ->pluck('jumlah', 'sumber_dana');
 
         return view('pages.dashboard', compact(
-            'totalProyek', 'totalUser', 'totalWarga', 'proyekAktif', 'proyekPerTahun'
+            'totalProyek',
+            'totalUser',
+            'totalWarga',
+            'proyekAktif',
+            'proyekPerTahun',
+            'sumberDana'
         ));
     }
 

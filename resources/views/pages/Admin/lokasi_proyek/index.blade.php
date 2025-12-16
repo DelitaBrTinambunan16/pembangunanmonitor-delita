@@ -3,26 +3,29 @@
 @section('content')
 <div class="container mt-4">
 
-<h2 class="mb-4 text-center">Daftar Lokasi Proyek</h2>
+    {{-- ================= JUDUL ================= --}}
+    <h4 class="mb-4 text-center fw-bold">Data Lokasi Proyek</h4>
 
-
-    <div class="mb-3 text-end">
-        <a href="{{ route('lokasi.create') }}" class="btn btn-primary">+ Tambah Lokasi</a>
+    {{-- ================= AKSI ATAS ================= --}}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div></div>
+        <a href="{{ route('lokasi.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Lokasi
+        </a>
     </div>
 
+    {{-- ================= ALERT ================= --}}
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    {{-- FILTER DAN SEARCH --}}
+    {{-- ================= FILTER & SEARCH ================= --}}
     <form method="GET" action="{{ route('lokasi.index') }}" class="mb-3">
+        <div class="row g-2 align-items-center">
 
-        <div class="row g-2">
-
-            {{-- Filter Proyek --}}
             <div class="col-md-3">
                 <select name="proyek_id" class="form-select" onchange="this.form.submit()">
-                    <option value=""> Semua Proyek </option>
+                    <option value="">Semua Proyek</option>
                     @foreach ($proyekList as $proyek)
                         <option value="{{ $proyek->proyek_id }}"
                             {{ request('proyek_id') == $proyek->proyek_id ? 'selected' : '' }}>
@@ -32,78 +35,113 @@
                 </select>
             </div>
 
-            {{-- Search --}}
-            <div class="col-md-3">
+            <div class="col-md-5">
                 <div class="input-group">
-                    <input
-                        type="text"
-                        name="search"
-                        class="form-control"
-                        value="{{ request('search') }}"
-                        placeholder="Search">
-
-                    <button type="submit" class="btn btn-primary px-3">
-                        <i class="fa fa-search"></i>
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Cari GeoJSON / Koordinat..."
+                           value="{{ request('search') }}">
+                    <button class="btn btn-primary">
+                        <i class="bi bi-search"></i>
                     </button>
 
-                    @if (request('search') || request('proyek_id'))
-                        <a href="{{ route('lokasi.index') }}" class="btn btn-secondary">Clear</a>
+                    @if(request('search') || request('proyek_id'))
+                        <a href="{{ route('lokasi.index') }}" class="btn btn-secondary">
+                            Clear
+                        </a>
                     @endif
                 </div>
             </div>
 
         </div>
-
     </form>
 
-    {{-- TABEL LIST --}}
+    {{-- ================= TABEL ================= --}}
     <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-center">
                 <tr>
-                    <th>No</th>
+                    <th width="50">No</th>
+                    <th width="80">Dokumen</th>
                     <th>Proyek</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
+                    <th width="120">Latitude</th>
+                    <th width="120">Longitude</th>
                     <th>GeoJSON</th>
-                    <th>Aksi</th>
+                    <th width="180">Aksi</th>
                 </tr>
             </thead>
 
             <tbody>
-                @forelse($lokasis as $index => $l)
+            @forelse($lokasis as $index => $l)
                 <tr>
-                    <td>{{ $lokasis->firstItem() + $index }}</td>
+
+                    <td class="text-center">
+                        {{ $lokasis->firstItem() + $index }}
+                    </td>
+
+                    {{-- DOKUMEN --}}
+                    <td class="text-center">
+                        @if($l->media && $l->media->count())
+                            <img src="{{ asset(
+                                'storage/uploads/'.$l->media->first()->ref_table.'/'.$l->media->first()->file_url
+                            ) }}"
+                                 width="45" height="45"
+                                 class="border rounded"
+                                 style="object-fit:cover">
+                        @else
+                            <img src="{{ asset('asset-admin/img/default-avatar.png') }}"
+                                 width="45" height="45"
+                                 class="border rounded opacity-75"
+                                 style="object-fit:cover">
+                        @endif
+                    </td>
+
                     <td>{{ $l->proyek->nama_proyek ?? '-' }}</td>
-                    <td>{{ $l->lat }}</td>
-                    <td>{{ $l->lng }}</td>
-                    <td>{{ Str::limit($l->geojson, 60) }}</td>
 
-                    <td>
-                        <a href="{{ route('lokasi.show', $l->lokasi_id) }}" class="btn btn-info btn-sm">Lihat</a>
-                        <a href="{{ route('lokasi.edit', $l->lokasi_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <td class="text-center">{{ $l->lat }}</td>
+                    <td class="text-center">{{ $l->lng }}</td>
 
-                        <form action="{{ route('lokasi.destroy', $l->lokasi_id) }}"
-                              method="POST"
-                              class="d-inline"
-                              onsubmit="return confirm('Yakin hapus?')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-danger btn-sm">Hapus</button>
-                        </form>
+                    <td>{{ Str::limit($l->geojson, 50) }}</td>
+
+                    {{-- AKSI --}}
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+
+                            <a href="{{ route('lokasi.show', $l->lokasi_id) }}"
+                               class="btn btn-info btn-sm" title="Detail">
+                                <i class="bi bi-eye"></i>
+                            </a>
+
+                            <a href="{{ route('lokasi.edit', $l->lokasi_id) }}"
+                               class="btn btn-warning btn-sm" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+
+                            <form action="{{ route('lokasi.destroy', $l->lokasi_id) }}"
+                                  method="POST"
+                                  onsubmit="return confirm('Yakin hapus lokasi ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm" title="Hapus">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
                     </td>
                 </tr>
-                @empty
+            @empty
                 <tr>
-                    <td colspan="6" class="text-center text-muted">Belum ada data lokasi</td>
+                    <td colspan="7" class="text-center text-muted">
+                        Belum ada data lokasi proyek
+                    </td>
                 </tr>
-                @endforelse
+            @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- PAGINATION --}}
-    <div class="mt-3">
+    {{-- ================= PAGINATION ================= --}}
+    <div class="d-flex justify-content-end mt-3">
         {{ $lokasis->links('pagination::simple-bootstrap-5') }}
     </div>
 

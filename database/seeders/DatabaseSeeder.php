@@ -15,12 +15,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call([
-            UserSeeder::class,
-            ProyekSeeder::class,
-            TahapanProyekSeeder::class,
-            WargaSeeder::class,
-        ]);
-
-    }
+$this->call([
+        UserSeeder::class,
+        ProyekSeeder::class,
+        TahapanProyekSeeder::class,
+        ProgresProyekSeeder::class,
+        LokasiProyekSeeder::class,
+        KontraktorSeeder::class,
+        MediaSeeder::class, 
+    ]);
+}
 }

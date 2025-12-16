@@ -1,10 +1,12 @@
 @extends('layouts.admin.app')
 
 @section('content')
-
 <body>
     <div class="container mt-5">
         <h2 class="mb-4 text-center">Edit Data Warga</h2>
+
+        {{-- Hanya Admin --}}
+        @if(auth()->user()->role === 'admin')
 
         <form action="{{ route('warga.update', $warga->warga_id) }}" method="POST">
             @csrf
@@ -53,6 +55,11 @@
                 <button type="submit" class="btn btn-success">Update</button>
             </div>
         </form>
+
+        @else
+            <div class="alert alert-danger">Anda tidak memiliki akses untuk mengedit data.</div>
+        @endif
+
     </div>
 </body>
 @endsection

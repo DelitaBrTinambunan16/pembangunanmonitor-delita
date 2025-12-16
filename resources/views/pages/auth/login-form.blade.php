@@ -6,7 +6,7 @@
 
         <!-- Kolom Kiri: Identitas -->
         <div class="col-lg-6 col-md-12 bg-secondary d-flex flex-column justify-content-center align-items-center text-center p-5 rounded-start shadow animate__animated animate__fadeInLeft animate__faster">
-            <img src="{{ asset('asset-admin/img/logo-desa.jpg') }}" alt="Logo Bina Desa" class="mb-4 shadow animate__animated animate__fadeInDown animate__delay-1s"
+            <img src="{{ asset('asset-admin/img/logo horizontal.png') }}" alt="Logo Bina Desa" class="mb-4 shadow animate__animated animate__fadeInDown animate__delay-1s"
               style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background-color: #fff; padding: 5px; border: 3px solid #dc3545;">
             <h2 class="text-danger fw-bold mb-3 animate__animated animate__fadeInDown animate__delay-2s">Sistem Monitoring Pembangunan Desa</h2>
             <p class="text-light mb-4 animate__animated animate__fadeInDown animate__delay-3s" style="max-width: 400px; line-height: 1.6;">
