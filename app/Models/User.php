@@ -23,7 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        
+
     ];
 
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder

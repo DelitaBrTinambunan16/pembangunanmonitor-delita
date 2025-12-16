@@ -1,36 +1,38 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Faker\Factory as Faker;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        User::create([
-            'name'     => 'kael',
-            'email'    => 'kael15@gmail.com',
-            'password' => Hash::make('12345'),
-            'role'     => 'admin',
-        ]);
+        // Admin default (anti duplicate)
+        User::firstOrCreate(
+            ['email' => 'kael15@gmail.com'],
+            [
+                'name' => 'kael',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
 
-        User::create([
-            'name'     => 'lia staff',
-            'email'    => 'lia24@gmail.com',
-            'password' => Hash::make('123456'),
-            'role'     => 'staff',
-        ]);
+        // Dummy user lain
+        $faker = Faker::create('id_ID');
 
-        User::create([
-            'name'     => 'User1',
-            'email'    => 'user1@gmail.com',
-            'password' => Hash::make('123456'),
-            'role'     => 'user',
-        ]);
+        foreach (range(1, 30) as $i) {
+            User::firstOrCreate(
+                ['email' => $faker->unique()->safeEmail()],
+                [
+                    'name' => $faker->name(),
+                    'password' => Hash::make('password'),
+                    'role' => $faker->randomElement(['admin', 'staff', 'user']),
+                ]
+            );
+        }
     }
 }
