@@ -20,7 +20,7 @@
 
 
     {{-- css --}}
-    @include('Layouts.auth.css')
+    @include('layouts.auth.css')
 
 </head>
 
@@ -31,6 +31,6 @@
 
 
 </body>
-@include('Layouts.auth.js')
+@include('layouts.auth.js')
 
 </html>
