@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\IdentitasController;
 use App\Http\Controllers\KontraktorController;
@@ -8,33 +11,72 @@ use App\Http\Controllers\ProgresProyekController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\TahapanProyekController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\WargaController;use Illuminate\Support\Facades\Route;use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\WargaController;
+use App\Http\Controllers\DashboardController;
 
-// Auth
+/*
+|--------------------------------------------------------------------------
+| ROOT / DASHBOARD (WAJIB LOGIN)
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
+
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('dashboard'),
+        'staff' => redirect()->route('staff.dashboard'),
+        'user'  => redirect()->route('view.dashboard'),
+        default => redirect()->route('login'),
+    };
+});
+
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// PROFILE PHOTO
-
+/*
+|--------------------------------------------------------------------------
+| USER PHOTO
+|--------------------------------------------------------------------------
+*/
 Route::get('/user/photo/{id}', function ($id) {
     $user = \App\Models\User::with('media')->findOrFail($id);
+
     if ($user->profile_picture && Storage::disk('public')->exists($user->profile_picture)) {
         return response()->file(storage_path('app/public/' . $user->profile_picture));
     }
+
     if ($user->media && Storage::disk('public')->exists($user->media->file_url)) {
         return response()->file(storage_path('app/public/' . $user->media->file_url));
     }
+
     return response()->file(public_path('assets/default-avatar.png'));
 })->name('user.photo');
 
-// login required routes
+/*
+|--------------------------------------------------------------------------
+| LOGIN REQUIRED
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['checklogin'])->group(function () {
 
-    // Dashboard
-
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN
+    |--------------------------------------------------------------------------
+    */
     Route::middleware(['role:admin'])->group(function () {
-// Admin
+
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
         Route::resource('user', UserController::class);
         Route::resource('proyek', ProyekController::class);
         Route::resource('tahapan', TahapanProyekController::class);
@@ -43,29 +85,40 @@ Route::middleware(['checklogin'])->group(function () {
         Route::resource('lokasi', LokasiProyekController::class);
         Route::resource('kontraktor', KontraktorController::class);
     });
-// Staff
+
+    /*
+    |--------------------------------------------------------------------------
+    | STAFF
+    |--------------------------------------------------------------------------
+    */
     Route::middleware(['role:staff'])
         ->prefix('staff')
         ->name('staff.')
         ->group(function () {
-            // PROYEK
+
+            Route::get('/dashboard', [DashboardController::class, 'staff'])
+                ->name('dashboard');
+
             Route::resource('proyek', ProyekController::class)->only(['index', 'create', 'store', 'show']);
-            // TAHAPAN
             Route::resource('tahapan', TahapanProyekController::class)->only(['index', 'create', 'store', 'show']);
-            // KONTRAKTOR
             Route::resource('kontraktor', KontraktorController::class)->only(['index', 'create', 'store', 'show']);
-            // LOKASI
             Route::resource('lokasi', LokasiProyekController::class)->only(['index', 'create', 'store', 'show']);
-            // PROGRES
             Route::resource('progres_proyek', ProgresProyekController::class)->only(['index', 'create', 'store', 'show']);
-            // WARGA
             Route::resource('warga', WargaController::class)->only(['index', 'create', 'store', 'show']);
         });
-// User
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER (VIEW ONLY)
+    |--------------------------------------------------------------------------
+    */
     Route::middleware(['role:user'])
         ->prefix('view')
         ->name('view.')
         ->group(function () {
+
+            Route::get('/dashboard', [DashboardController::class, 'user'])
+                ->name('dashboard');
 
             Route::resource('proyek', ProyekController::class)->only(['index', 'show']);
             Route::resource('tahapan', TahapanProyekController::class)->only(['index', 'show']);
@@ -75,5 +128,10 @@ Route::middleware(['checklogin'])->group(function () {
             Route::resource('warga', WargaController::class)->only(['index', 'show']);
         });
 });
-// Identitas
+
+/*
+|--------------------------------------------------------------------------
+| IDENTITAS (PUBLIC)
+|--------------------------------------------------------------------------
+*/
 Route::get('/identitas', [IdentitasController::class, 'index'])->name('identitas');
