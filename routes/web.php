@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IdentitasController;
 use App\Http\Controllers\KontraktorController;
 use App\Http\Controllers\LokasiProyekController;
@@ -12,24 +10,21 @@ use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\TahapanProyekController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WargaController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MediaController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
 
 /*
 |--------------------------------------------------------------------------
-| ROOT / DASHBOARD (WAJIB LOGIN)
+| ROOT → WAJIB LOGIN → DASHBOARD
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    if (!auth()->check()) {
+    if (! auth()->check()) {
         return redirect()->route('login');
     }
-
-    return match (auth()->user()->role) {
-        'admin' => redirect()->route('dashboard'),
-        'staff' => redirect()->route('staff.dashboard'),
-        'user'  => redirect()->route('view.dashboard'),
-        default => redirect()->route('login'),
-    };
+    return redirect()->route('dashboard');
 });
 
 /*
@@ -67,16 +62,23 @@ Route::get('/user/photo/{id}', function ($id) {
 */
 Route::middleware(['checklogin'])->group(function () {
 
+    Route::delete('/media/{id}', [MediaController::class, 'destroy'])
+        ->name('media.destroy');
+
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD (SATU UNTUK SEMUA ROLE)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
     /*
     |--------------------------------------------------------------------------
     | ADMIN
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:admin'])->group(function () {
-
-        Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard');
-
         Route::resource('user', UserController::class);
         Route::resource('proyek', ProyekController::class);
         Route::resource('tahapan', TahapanProyekController::class);
@@ -96,9 +98,6 @@ Route::middleware(['checklogin'])->group(function () {
         ->name('staff.')
         ->group(function () {
 
-            Route::get('/dashboard', [DashboardController::class, 'staff'])
-                ->name('dashboard');
-
             Route::resource('proyek', ProyekController::class)->only(['index', 'create', 'store', 'show']);
             Route::resource('tahapan', TahapanProyekController::class)->only(['index', 'create', 'store', 'show']);
             Route::resource('kontraktor', KontraktorController::class)->only(['index', 'create', 'store', 'show']);
@@ -116,9 +115,6 @@ Route::middleware(['checklogin'])->group(function () {
         ->prefix('view')
         ->name('view.')
         ->group(function () {
-
-            Route::get('/dashboard', [DashboardController::class, 'user'])
-                ->name('dashboard');
 
             Route::resource('proyek', ProyekController::class)->only(['index', 'show']);
             Route::resource('tahapan', TahapanProyekController::class)->only(['index', 'show']);

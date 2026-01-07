@@ -29,6 +29,12 @@ class Kontraktor extends Model
     {
         return $this->belongsTo(Proyek::class, 'proyek_id', 'proyek_id');
     }
+public function media()
+{
+    return $this->hasMany(Media::class, 'ref_id', 'kontraktor_id')
+                ->where('ref_table', 'kontraktor')
+                ->orderBy('sort_order');
+}
 
     // Scope filter
     public function scopeFilter(Builder $query, $request, array $filterableColumns): Builder

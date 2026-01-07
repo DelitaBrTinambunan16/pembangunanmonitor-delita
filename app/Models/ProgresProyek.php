@@ -35,7 +35,8 @@ class ProgresProyek extends Model
     public function media()
     {
         return $this->hasMany(Media::class, 'ref_id', 'progres_id')
-                     ->where('ref_table', 'progres_proyek');
+                     ->where('ref_table', 'progres')
+                     ->orderBy('sort_order');
     }
     // FILTER
 public function scopeFilter($query, $request, array $columns)

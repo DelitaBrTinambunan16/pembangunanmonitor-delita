@@ -13,15 +13,12 @@
             <div class="col-md-6"><strong>Alamat</strong><br>{{ $item->alamat }}</div>
             <div class="col-md-6"><strong>Proyek</strong><br>{{ $item->proyek->nama_proyek ?? '-' }}</div>
         </div>
-
-        <h6 class="mb-3">Dokumen Kontraktor</h6>
-
         @if ($item->media && $item->media->count())
             <div class="row">
                 @foreach ($item->media as $media)
                     @php
                         $isImage = Str::startsWith($media->mime_type, 'image');
-                        $path = asset('storage/uploads/' . $media->ref_table . '/' . $media->file_url);
+                       $path = asset($media->file_url);
                     @endphp
                     <div class="col-6 col-md-3 mb-3 text-center">
                         @if ($isImage)
@@ -36,13 +33,13 @@
                 @endforeach
             </div>
         @else
-            {{-- PLACEHOLDER --}}
+            {{-- PLACEHOLDER
             <div class="d-flex justify-content-center py-4">
                 <div class="text-center opacity-75">
                     <img src="{{ asset('asset-admin/img/default-avatar.png') }}" width="80">
                     <div class="text-muted small">Belum ada dokumen kontraktor</div>
                 </div>
-            </div>
+            </div> --}}
         @endif
 
         <a href="{{ route('kontraktor.index') }}" class="btn btn-secondary mt-3">Kembali</a>

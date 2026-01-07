@@ -1,5 +1,9 @@
 @extends('layouts.admin.app')
 
+@php
+    use Illuminate\Support\Str;
+@endphp
+
 @section('content')
 <div class="container mt-4">
 
@@ -86,7 +90,6 @@
             <tbody>
             @forelse($lokasis as $index => $l)
                 <tr>
-
                     <td class="text-center">
                         {{ $lokasis->firstItem() + $index }}
                     </td>
@@ -94,9 +97,7 @@
                     {{-- DOKUMEN --}}
                     <td class="text-center">
                         @if($l->media && $l->media->count())
-                            <img src="{{ asset(
-                                'storage/uploads/'.$l->media->first()->ref_table.'/'.$l->media->first()->file_url
-                            ) }}"
+                            <img src="{{ asset($l->media->first()->file_url) }}"
                                  width="45" height="45"
                                  class="border rounded"
                                  style="object-fit:cover">
@@ -109,42 +110,35 @@
                     </td>
 
                     <td>{{ $l->proyek->nama_proyek ?? '-' }}</td>
-
                     <td class="text-center">{{ $l->lat }}</td>
                     <td class="text-center">{{ $l->lng }}</td>
-
                     <td>{{ Str::limit($l->geojson, 50) }}</td>
 
-                    {{-- ================= AKSI ================= --}}
+                    {{-- AKSI --}}
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
 
-                            {{-- LIHAT (SEMUA ROLE) --}}
                             <a href="{{ auth()->user()->role === 'admin'
                                 ? route('lokasi.show', $l->lokasi_id)
                                 : (auth()->user()->role === 'staff'
                                     ? route('staff.lokasi.show', $l->lokasi_id)
                                     : route('view.lokasi.show', $l->lokasi_id)) }}"
-                               class="btn btn-info btn-sm" title="Detail">
+                               class="btn btn-info btn-sm">
                                 <i class="bi bi-eye"></i>
                             </a>
 
-                            {{-- EDIT (ADMIN ONLY) --}}
                             @if(auth()->user()->role === 'admin')
                             <a href="{{ route('lokasi.edit', $l->lokasi_id) }}"
-                               class="btn btn-warning btn-sm" title="Edit">
+                               class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
-                            @endif
 
-                            {{-- HAPUS (ADMIN ONLY) --}}
-                            @if(auth()->user()->role === 'admin')
                             <form action="{{ route('lokasi.destroy', $l->lokasi_id) }}"
                                   method="POST"
                                   onsubmit="return confirm('Yakin hapus lokasi ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-danger btn-sm" title="Hapus">
+                                <button class="btn btn-danger btn-sm">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -164,8 +158,7 @@
         </table>
     </div>
 
-    {{-- ================= PAGINATION ================= --}}
-        {{ $lokasis->links('pagination::simple-bootstrap-5') }}
+    {{ $lokasis->links('pagination::simple-bootstrap-5') }}
 
 </div>
 @endsection

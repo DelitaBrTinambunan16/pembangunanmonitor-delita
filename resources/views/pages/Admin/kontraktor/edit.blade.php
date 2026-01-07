@@ -48,15 +48,15 @@
                       class="form-control">{{ $item->alamat }}</textarea>
         </div>
 
-        {{-- UPLOAD FILE BARU --}}
+        {{-- UPLOAD FILE BARU
         <div class="mb-4">
             <label class="fw-bold">Upload Dokumen Baru</label>
             <input type="file" name="files[]" class="form-control" multiple>
             <small class="text-muted">Gambar / PDF / Dokumen lain</small>
-        </div>
+        </div> --}}
 
-        {{-- ================= DOKUMEN / PLACEHOLDER ================= --}}
-        <h5 class="mb-3">Dokumen Kontraktor</h5>
+        {{-- ================= DOKUMEN / PLACEHOLDER =================
+        <h5 class="mb-3">Dokumen Kontraktor</h5> --}}
 
         @if($item->media && $item->media->count())
             <div class="row">
@@ -90,7 +90,7 @@
                 @endforeach
             </div>
         @else
-            {{-- PLACEHOLDER --}}
+            {{-- PLACEHOLDER
             <div class="d-flex justify-content-center">
                 <div class="text-center opacity-75">
                     <img src="{{ asset('asset-admin/img/default-avatar.png') }}"
@@ -100,7 +100,7 @@
                     </div>
                 </div>
             </div>
-        @endif
+        @endif --}}
 
         {{-- AKSI --}}
         <div class="text-end mt-4">

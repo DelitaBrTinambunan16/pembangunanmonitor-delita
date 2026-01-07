@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\LokasiProyek;
@@ -9,23 +10,21 @@ class LokasiProyekController extends Controller
 {
     public function index(Request $request)
     {
-        $filterableColumns = ['proyek_id'];
-        $searchableColumns = ['lat', 'lng', 'geojson'];
-
-        $lokasis = LokasiProyek::with('proyek')
-            ->when($request->filled('proyek_id'), fn($q) => $q->where('proyek_id', $request->proyek_id))
-            ->when($request->filled('search'), function ($q) use ($request, $searchableColumns) {
-                $q->where(function ($q2) use ($request, $searchableColumns) {
-                    foreach ($searchableColumns as $col) {
-                        $q2->orWhere($col, 'like', '%' . $request->search . '%');
-                    }
-                });
-            })
+        $lokasis = LokasiProyek::with(['proyek','media'])
+            ->when($request->filled('proyek_id'), fn ($q) =>
+                $q->where('proyek_id', $request->proyek_id)
+            )
+            ->when($request->filled('search'), fn ($q) =>
+                $q->where('lat', 'like', "%{$request->search}%")
+                  ->orWhere('lng', 'like', "%{$request->search}%")
+                  ->orWhere('geojson', 'like', "%{$request->search}%")
+            )
             ->simplePaginate(10)
             ->withQueryString();
 
         $proyekList = Proyek::all();
-        return view('pages.admin.lokasi_proyek.index', compact('lokasis', 'proyekList'));
+
+        return view('pages.admin.lokasi_proyek.index', compact('lokasis','proyekList'));
     }
 
     public function create()
@@ -41,41 +40,43 @@ class LokasiProyekController extends Controller
             'lat'       => 'nullable|numeric',
             'lng'       => 'nullable|numeric',
             'geojson'   => 'nullable|string',
-            'files.*'   => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xlsx|max:20480',
+            'files.*'   => 'file|mimes:jpg,jpeg,png,pdf|max:20480',
         ]);
 
-        $uploadedFiles = [];
+        // SIMPAN DATA LOKASI
+        $lokasi = LokasiProyek::create(
+            $request->only(['proyek_id','lat','lng','geojson'])
+        );
+
+        // SIMPAN MEDIA (FIX TOTAL)
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/uploads/lokasi_proyek', $fileName);
-                $uploadedFiles[] = $fileName;
-            }
+            $mediaRequest = new Request([
+                'ref_table' => 'lokasi',
+                'ref_id'    => $lokasi->lokasi_id,
+            ]);
+
+            $mediaRequest->files->set('files', $request->file('files'));
+
+            app(\App\Http\Controllers\MediaController::class)
+                ->store($mediaRequest);
         }
 
-        LokasiProyek::create(array_merge(
-            $request->only(['proyek_id', 'lat', 'lng', 'geojson']),
-            ['files' => $uploadedFiles]
-        ));
-
-        return redirect()->route('lokasi_proyek.index')->with('success', 'Lokasi berhasil ditambahkan!');
+        return redirect()->route('lokasi.index')
+            ->with('success','Lokasi berhasil ditambahkan');
     }
 
     public function show($id)
     {
-        $item = LokasiProyek::findOrFail($id);
+        $item = LokasiProyek::with(['proyek','media'])->findOrFail($id);
         return view('pages.admin.lokasi_proyek.show', compact('item'));
     }
 
     public function edit($id)
     {
-        $item       = LokasiProyek::with('media')->findOrFail($id);
+        $item = LokasiProyek::with('media')->findOrFail($id);
         $proyekList = Proyek::orderBy('nama_proyek')->get();
 
-        return view('pages.admin.lokasi_proyek.edit', compact(
-            'item',
-            'proyekList'
-        ));
+        return view('pages.admin.lokasi_proyek.edit', compact('item','proyekList'));
     }
 
     public function update(Request $request, $id)
@@ -87,60 +88,42 @@ class LokasiProyekController extends Controller
             'lat'       => 'nullable|numeric',
             'lng'       => 'nullable|numeric',
             'geojson'   => 'nullable|string',
-            'files.*'   => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xlsx|max:20480',
+            'files.*'   => 'file|mimes:jpg,jpeg,png,pdf|max:20480',
         ]);
 
-        $existingFiles = $lokasi->files ?? [];
-        $uploadedFiles = $existingFiles;
+        $lokasi->update(
+            $request->only(['proyek_id','lat','lng','geojson'])
+        );
 
+        // TAMBAH MEDIA BARU (FIX TOTAL)
         if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                $file->storeAs('public/uploads/lokasi_proyek', $fileName);
-                $uploadedFiles[] = $fileName;
-            }
+            $mediaRequest = new Request([
+                'ref_table' => 'lokasi',
+                'ref_id'    => $lokasi->lokasi_id,
+            ]);
+
+            $mediaRequest->files->set('files', $request->file('files'));
+
+            app(\App\Http\Controllers\MediaController::class)
+                ->store($mediaRequest);
         }
 
-        $lokasi->update(array_merge(
-            $request->only(['proyek_id', 'lat', 'lng', 'geojson']),
-            ['files' => $uploadedFiles]
-        ));
-
-        return redirect()->route('lokasi_proyek.edit', $lokasi->lokasi_id)->with('success', 'Lokasi berhasil diperbarui!');
+        return redirect()->route('lokasi.edit', $lokasi->lokasi_id)
+            ->with('success','Lokasi berhasil diperbarui');
     }
 
     public function destroy($id)
     {
-        $lokasi = LokasiProyek::findOrFail($id);
+        $lokasi = LokasiProyek::with('media')->findOrFail($id);
 
-        // hapus semua file
-        foreach ($lokasi->files ?? [] as $file) {
-            $path = storage_path('app/public/uploads/lokasi_proyek/' . $file);
-            if (file_exists($path)) {
-                unlink($path);
-            }
-
-        }
-        $item->delete();
-        return redirect()->route('lokasi.index')->with('success', 'Lokasi berhasil dihapus!');
-    }
-
-    // Hapus satu file
-    public function destroyFile($id, $filename)
-    {
-        $lokasi = LokasiProyek::findOrFail($id);
-        $files  = $lokasi->files ?? [];
-
-        if (in_array($filename, $files)) {
-            $path = storage_path('app/public/uploads/lokasi_proyek/' . $filename);
-            if (file_exists($path)) {
-                unlink($path);
-            }
-
-            $files = array_filter($files, fn($f) => $f !== $filename);
-            $lokasi->update(['files' => array_values($files)]);
+        foreach ($lokasi->media as $media) {
+            app(\App\Http\Controllers\MediaController::class)
+                ->destroy($media->media_id);
         }
 
-        return back()->with('success', 'File berhasil dihapus!');
+        $lokasi->delete();
+
+        return redirect()->route('lokasi.index')
+            ->with('success','Lokasi berhasil dihapus');
     }
 }

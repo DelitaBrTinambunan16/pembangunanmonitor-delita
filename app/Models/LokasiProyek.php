@@ -34,7 +34,7 @@ class LokasiProyek extends Model
     public function media()
     {
         return $this->hasMany(Media::class, 'ref_id', 'lokasi_id')
-            ->where('ref_table', 'lokasi_proyek')
+            ->where('ref_table', 'lokasi')
             ->orderBy('sort_order');
     }
 

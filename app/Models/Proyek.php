@@ -17,6 +17,7 @@ class Proyek extends Model
         'kode_proyek',
         'nama_proyek',
         'tahun',
+        'lokasi',
         'anggaran',
         'sumber_dana',
         'deskripsi',

@@ -46,6 +46,7 @@ class ProyekController extends Controller
             'kode_proyek' => 'required',
             'nama_proyek' => 'required',
             'tahun' => 'required',
+            'lokasi'      => 'required',
             'anggaran' => 'required',
             'sumber_dana' => 'required',
             'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
@@ -56,6 +57,7 @@ class ProyekController extends Controller
             'kode_proyek' => $request->kode_proyek,
             'nama_proyek' => $request->nama_proyek,
             'tahun' => $request->tahun,
+            'lokasi' => $request->lokasi,
             'anggaran' => $request->anggaran,
             'sumber_dana' => $request->sumber_dana,
             'deskripsi' => $request->deskripsi,
@@ -111,6 +113,7 @@ public function show($id)
             'kode_proyek' => 'required',
             'nama_proyek' => 'required',
             'tahun' => 'required',
+            'lokasi'      => 'required',
             'anggaran' => 'required',
             'sumber_dana' => 'required',
             'files.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120'
@@ -123,6 +126,7 @@ public function show($id)
             'kode_proyek' => $request->kode_proyek,
             'nama_proyek' => $request->nama_proyek,
             'tahun' => $request->tahun,
+            'lokasi' => $request->lokasi,
             'anggaran' => $request->anggaran,
             'sumber_dana' => $request->sumber_dana,
             'deskripsi' => $request->deskripsi,
