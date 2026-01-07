@@ -5,16 +5,29 @@
 
     <h2 class="mb-4 text-center">Detail Kontraktor</h2>
 
+    {{-- TOMBOL TAMBAH (ADMIN + STAFF) --}}
+    @if(in_array(auth()->user()->role, ['admin','staff']))
     <div class="mb-3 text-end">
-        <a href="{{ route('kontraktor.create') }}" class="btn btn-primary">+ Tambah Kontraktor</a>
+        <a href="{{ auth()->user()->role === 'admin'
+            ? route('kontraktor.create')
+            : route('staff.kontraktor.create') }}"
+           class="btn btn-primary">
+            + Tambah Kontraktor
+        </a>
     </div>
+    @endif
 
     @if (session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     {{-- FILTER & SEARCH --}}
-    <form method="GET" action="{{ route('kontraktor.index') }}" class="mb-3">
+    <form method="GET"
+          action="{{ auth()->user()->role === 'admin'
+                ? route('kontraktor.index')
+                : route('staff.kontraktor.index') }}"
+          class="mb-3">
+
         <div class="row g-2">
             <div class="col-md-3">
                 <select name="proyek_id" class="form-select" onchange="this.form.submit()">
@@ -33,13 +46,15 @@
                     <input type="text" name="search" class="form-control"
                            placeholder="Search..."
                            value="{{ request('search') }}">
-
                     <button class="btn btn-primary">
                         <i class="bi bi-search"></i>
                     </button>
 
                     @if(request('search') || request('proyek_id'))
-                        <a href="{{ route('kontraktor.index') }}" class="btn btn-secondary">
+                        <a href="{{ auth()->user()->role === 'admin'
+                            ? route('kontraktor.index')
+                            : route('staff.kontraktor.index') }}"
+                           class="btn btn-secondary">
                             Clear
                         </a>
                     @endif
@@ -72,7 +87,7 @@
                         {{ $kontraktors->firstItem() + $index }}
                     </td>
 
-                    {{-- DOKUMEN (SAMA DENGAN PROYEK, TAHAPAN, LOKASI) --}}
+                    {{-- DOKUMEN --}}
                     <td class="text-center">
                         @if($kontraktor->media && $kontraktor->media->count())
                             <img src="{{ asset(
@@ -95,20 +110,30 @@
                     <td>{{ $kontraktor->kontak }}</td>
                     <td class="text-start">{{ $kontraktor->alamat }}</td>
 
-                    {{-- AKSI (IDENTIK SEMUA MODUL) --}}
+                    {{-- AKSI --}}
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
 
-                            <a href="{{ route('kontraktor.show', $kontraktor->kontraktor_id) }}"
+                            {{-- LIHAT (SEMUA ROLE) --}}
+                            <a href="{{ auth()->user()->role === 'admin'
+                                ? route('kontraktor.show', $kontraktor->kontraktor_id)
+                                : (auth()->user()->role === 'staff'
+                                    ? route('staff.kontraktor.show', $kontraktor->kontraktor_id)
+                                    : route('view.kontraktor.show', $kontraktor->kontraktor_id)) }}"
                                class="btn btn-info btn-sm" title="Lihat">
                                 <i class="bi bi-eye"></i>
                             </a>
 
+                            {{-- EDIT (ADMIN ONLY) --}}
+                            @if(auth()->user()->role === 'admin')
                             <a href="{{ route('kontraktor.edit', $kontraktor->kontraktor_id) }}"
                                class="btn btn-warning btn-sm" title="Edit">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
+                            @endif
 
+                            {{-- HAPUS (ADMIN ONLY) --}}
+                            @if(auth()->user()->role === 'admin')
                             <form action="{{ route('kontraktor.destroy', $kontraktor->kontraktor_id) }}"
                                   method="POST"
                                   onsubmit="return confirm('Yakin hapus kontraktor ini?')">
@@ -118,6 +143,7 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            @endif
 
                         </div>
                     </td>

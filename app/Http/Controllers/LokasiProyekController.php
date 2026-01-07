@@ -121,9 +121,8 @@ class LokasiProyekController extends Controller
             }
 
         }
-
-        $lokasi->delete();
-        return redirect()->route('lokasi_proyek.index')->with('success', 'Lokasi berhasil dihapus!');
+        $item->delete();
+        return redirect()->route('lokasi.index')->with('success', 'Lokasi berhasil dihapus!');
     }
 
     // Hapus satu file

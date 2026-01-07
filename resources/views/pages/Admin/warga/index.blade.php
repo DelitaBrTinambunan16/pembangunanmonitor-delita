@@ -8,7 +8,10 @@
     {{-- TOMBOL TAMBAH --}}
     <div class="mb-3 text-end">
         @if(in_array(auth()->user()->role, ['admin','staff']))
-            <a href="{{ route('warga.create') }}" class="btn btn-primary">
+            <a href="{{ auth()->user()->role === 'admin'
+                ? route('warga.create')
+                : route('staff.warga.create') }}"
+               class="btn btn-primary">
                 + Tambah Warga
             </a>
         @endif
@@ -76,28 +79,27 @@
                     <td>{{ $w->telp }}</td>
                     <td>{{ $w->email }}</td>
 
-                    {{--  AKSI  --}}
+                    {{-- AKSI --}}
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
 
-                            {{-- LIHAT --}}
-                            <a href="{{ route('warga.show', $w->warga_id) }}"
+                            {{-- LIHAT (SEMUA ROLE) --}}
+                            <a href="{{ auth()->user()->role === 'admin'
+                                ? route('warga.show', $w->warga_id)
+                                : (auth()->user()->role === 'staff'
+                                    ? route('staff.warga.show', $w->warga_id)
+                                    : route('view.warga.show', $w->warga_id)) }}"
                                class="btn btn-info btn-sm"
                                title="Lihat">
                                 <i class="bi bi-eye"></i>
                             </a>
-
-                            {{-- EDIT --}}
+                            {{-- EDIT & HAPUS (ADMIN SAJA) --}}
                             @if(auth()->user()->role === 'admin')
                                 <a href="{{ route('warga.edit', $w->warga_id) }}"
                                    class="btn btn-warning btn-sm"
                                    title="Edit">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                            @endif
-
-                            {{-- HAPUS --}}
-                            @if(auth()->user()->role === 'admin')
                                 <form action="{{ route('warga.destroy', $w->warga_id) }}"
                                       method="POST"
                                       onsubmit="return confirm('Yakin hapus data ini?')">

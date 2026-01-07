@@ -4,10 +4,16 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center">Detail Tahapan Proyek</h2>
 
+    {{-- TOMBOL TAMBAH --}}
     <div class="mb-3 text-end">
-        <a href="{{ route('tahapan.create') }}" class="btn btn-primary">
-            Tambah Tahapan
-        </a>
+        @if(in_array(auth()->user()->role, ['admin','staff']))
+            <a href="{{ auth()->user()->role === 'admin'
+                ? route('tahapan.create')
+                : route('staff.tahapan.create') }}"
+               class="btn btn-primary">
+                Tambah Tahapan
+            </a>
+        @endif
     </div>
 
     @if (session('success'))
@@ -43,8 +49,8 @@
     {{-- TABLE --}}
     <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle">
-            <thead class="table-dark">
-                <tr class="text-center">
+            <thead class="table-dark text-center">
+                <tr>
                     <th width="50">No</th>
                     <th width="80">Dokumen</th>
                     <th>Nama Proyek</th>
@@ -89,25 +95,35 @@
                     {{-- AKSI --}}
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
-                            <a href="{{ route('tahapan.show', $t->tahap_id) }}"
+
+                            {{-- LIHAT (SEMUA ROLE) --}}
+                            <a href="{{ auth()->user()->role === 'admin'
+                                ? route('tahapan.show', $t->tahap_id)
+                                : (auth()->user()->role === 'staff'
+                                    ? route('staff.tahapan.show', $t->tahap_id)
+                                    : route('view.tahapan.show', $t->tahap_id)) }}"
                                class="btn btn-info btn-sm">
                                 <i class="bi bi-eye"></i>
                             </a>
 
-                            <a href="{{ route('tahapan.edit', $t->tahap_id) }}"
-                               class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
+                            {{-- EDIT & HAPUS (ADMIN SAJA) --}}
+                            @if(auth()->user()->role === 'admin')
+                                <a href="{{ route('tahapan.edit', $t->tahap_id) }}"
+                                   class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
 
-                            <form action="{{ route('tahapan.destroy', $t->tahap_id) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('Yakin hapus tahapan ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                                <form action="{{ route('tahapan.destroy', $t->tahap_id) }}"
+                                      method="POST"
+                                      onsubmit="return confirm('Yakin hapus tahapan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
+
                         </div>
                     </td>
                 </tr>
@@ -122,8 +138,6 @@
         </table>
     </div>
 
-    <div class="mt-3">
-        {{ $tahapan->links('pagination::simple-bootstrap-5') }}
-    </div>
+    {{ $tahapan->links('pagination::simple-bootstrap-5') }}
 </div>
 @endsection

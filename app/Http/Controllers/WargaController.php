@@ -6,14 +6,10 @@ use Illuminate\Http\Request;
 
 class WargaController extends Controller
 {
-    /**
-     * Tampilkan semua data warga
-     */
     public function index(Request $request)
     {
         //Daftar kolom yang bisa difilter sesuai pada form pencarian
         $filterableColumns = ['jenis_kelamin'];
-
         //Search
         $searchableColumns = [
             'no_ktp',
@@ -24,7 +20,6 @@ class WargaController extends Controller
             'telp',
             'email',
         ];
-
         //Gunakan scope filter pada model Warga untuk memproses query filter
         $warga = Warga::filter($request, $filterableColumns)
             ->search($request, $searchableColumns)

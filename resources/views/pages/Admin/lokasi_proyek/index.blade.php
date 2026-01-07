@@ -7,12 +7,17 @@
     <h4 class="mb-4 text-center fw-bold">Data Lokasi Proyek</h4>
 
     {{-- ================= AKSI ATAS ================= --}}
+    @if(in_array(auth()->user()->role, ['admin','staff']))
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div></div>
-        <a href="{{ route('lokasi.create') }}" class="btn btn-primary">
+        <a href="{{ auth()->user()->role === 'admin'
+            ? route('lokasi.create')
+            : route('staff.lokasi.create') }}"
+           class="btn btn-primary">
             <i class="bi bi-plus-circle me-1"></i> Tambah Lokasi
         </a>
     </div>
+    @endif
 
     {{-- ================= ALERT ================= --}}
     @if (session('success'))
@@ -20,7 +25,12 @@
     @endif
 
     {{-- ================= FILTER & SEARCH ================= --}}
-    <form method="GET" action="{{ route('lokasi.index') }}" class="mb-3">
+    <form method="GET"
+          action="{{ auth()->user()->role === 'admin'
+                ? route('lokasi.index')
+                : route('staff.lokasi.index') }}"
+          class="mb-3">
+
         <div class="row g-2 align-items-center">
 
             <div class="col-md-3">
@@ -45,7 +55,10 @@
                     </button>
 
                     @if(request('search') || request('proyek_id'))
-                        <a href="{{ route('lokasi.index') }}" class="btn btn-secondary">
+                        <a href="{{ auth()->user()->role === 'admin'
+                            ? route('lokasi.index')
+                            : route('staff.lokasi.index') }}"
+                           class="btn btn-secondary">
                             Clear
                         </a>
                     @endif
@@ -102,20 +115,30 @@
 
                     <td>{{ Str::limit($l->geojson, 50) }}</td>
 
-                    {{-- AKSI --}}
+                    {{-- ================= AKSI ================= --}}
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
 
-                            <a href="{{ route('lokasi.show', $l->lokasi_id) }}"
+                            {{-- LIHAT (SEMUA ROLE) --}}
+                            <a href="{{ auth()->user()->role === 'admin'
+                                ? route('lokasi.show', $l->lokasi_id)
+                                : (auth()->user()->role === 'staff'
+                                    ? route('staff.lokasi.show', $l->lokasi_id)
+                                    : route('view.lokasi.show', $l->lokasi_id)) }}"
                                class="btn btn-info btn-sm" title="Detail">
                                 <i class="bi bi-eye"></i>
                             </a>
 
+                            {{-- EDIT (ADMIN ONLY) --}}
+                            @if(auth()->user()->role === 'admin')
                             <a href="{{ route('lokasi.edit', $l->lokasi_id) }}"
                                class="btn btn-warning btn-sm" title="Edit">
                                 <i class="bi bi-pencil-square"></i>
                             </a>
+                            @endif
 
+                            {{-- HAPUS (ADMIN ONLY) --}}
+                            @if(auth()->user()->role === 'admin')
                             <form action="{{ route('lokasi.destroy', $l->lokasi_id) }}"
                                   method="POST"
                                   onsubmit="return confirm('Yakin hapus lokasi ini?')">
@@ -125,6 +148,7 @@
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+                            @endif
 
                         </div>
                     </td>
@@ -141,9 +165,7 @@
     </div>
 
     {{-- ================= PAGINATION ================= --}}
-    <div class="d-flex justify-content-end mt-3">
         {{ $lokasis->links('pagination::simple-bootstrap-5') }}
-    </div>
 
 </div>
 @endsection

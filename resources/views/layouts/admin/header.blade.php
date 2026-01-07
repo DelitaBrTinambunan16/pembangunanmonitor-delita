@@ -5,13 +5,6 @@
     <a href="#" class="sidebar-toggler flex-shrink-0 me-3">
         <i class="fa fa-bars"></i>
     </a>
-    <!-- Logo di Header -->
-    <a href="{{ route('dashboard') }}" class="navbar-brand d-flex align-items-center">
-        <img src="{{ asset('asset-admin/img/logo vertikal.png') }}" class="rounded-circle me-2"
-            style="width: auto; height: 40px; object-fit: cover;">
-        <span class="fw-bold">Pembangunan Desa</span>
-    </a>
-
     <!-- Search -->
     <form class="d-none d-md-flex ms-4">
         <input class="form-control bg-dark border-0" type="search" placeholder="Search">

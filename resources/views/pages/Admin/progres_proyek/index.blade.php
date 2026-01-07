@@ -4,16 +4,25 @@
     <div class="container mt-4">
         <h2 class="mb-4 text-center">Detail Progres Proyek</h2>
 
-        <div class="mb-3 text-end">
-            <a href="{{ route('progres_proyek.create') }}" class="btn btn-primary">+ Tambah Progres</a>
-        </div>
+        {{-- ===== TOMBOL TAMBAH (ADMIN & STAFF) ===== --}}
+        @if (in_array(auth()->user()->role, ['admin', 'staff']))
+            <div class="mb-3 text-end">
+                <a href="{{ auth()->user()->role === 'admin' ? route('progres_proyek.create') : route('staff.progres_proyek.create') }}"
+                    class="btn btn-primary">
+                    + Tambah Progres
+                </a>
+            </div>
+        @endif
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
         {{-- FILTER & SEARCH --}}
-        <form method="GET" action="{{ route('progres_proyek.index') }}" class="mb-3">
+        <form method="GET"
+            action="{{ auth()->user()->role === 'admin' ? route('progres_proyek.index') : route('staff.progres_proyek.index') }}"
+            class="mb-3">
+
             <div class="row g-2">
                 <div class="col-md-3">
                     <select name="proyek_id" class="form-select" onchange="this.form.submit()">
@@ -31,7 +40,7 @@
                     <div class="input-group">
                         <input type="text" name="search" class="form-control" value="{{ request('search') }}"
                             placeholder="Search catatan...">
-                        <button type="submit" class="btn btn-primary">
+                        <button class="btn btn-primary">
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
@@ -44,14 +53,14 @@
             <table class="table table-bordered table-striped align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th style="width:60px">No</th>
-                        <th style="width:80px">Dokumen</th>
+                        <th width="60">No</th>
+                        <th width="80">Dokumen</th>
                         <th>Proyek</th>
                         <th>Tahap</th>
                         <th>Persen (%)</th>
                         <th>Tanggal</th>
                         <th>Catatan</th>
-                        <th style="width:170px" class="text-center">Aksi</th>
+                        <th width="170" class="text-center">Aksi</th>
                     </tr>
                 </thead>
 
@@ -59,6 +68,7 @@
                     @forelse ($progres as $index => $p)
                         <tr>
                             <td>{{ $progres->firstItem() + $index }}</td>
+
                             {{-- DOKUMEN --}}
                             <td class="text-center">
                                 @if ($p->media->count())
@@ -76,27 +86,42 @@
                             <td>{{ $p->tanggal }}</td>
                             <td>{{ $p->catatan }}</td>
 
+                            {{-- ===== AKSI ===== --}}
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-1">
 
-                                    <a href="{{ route('progres_proyek.show', $p->progres_id) }}"
+                                    {{-- LIHAT (SEMUA ROLE) --}}
+                                    <a href="{{ auth()->user()->role === 'admin'
+                                        ? route('progres_proyek.show', $p->progres_id)
+                                        : (auth()->user()->role === 'staff'
+                                            ? route('staff.progres_proyek.show', $p->progres_id)
+                                            : route('view.progres_proyek.show', $p->progres_id)) }}"
                                         class="btn btn-info btn-sm" title="Lihat">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
-                                    <a href="{{ route('progres_proyek.edit', $p->progres_id) }}"
-                                        class="btn btn-warning btn-sm" title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
+                                    {{-- EDIT (ADMIN ONLY) --}}
+                                    @if (auth()->user()->role === 'admin')
+                                        <a href="{{ route('progres_proyek.edit', $p->progres_id) }}"
+                                            class="btn btn-warning btn-sm" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    @endif
 
-                                    <form action="{{ route('progres_proyek.destroy', $p->progres_id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin hapus progres ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" title="Hapus">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    {{-- HAPUS (ADMIN ONLY) --}}
+                                    @if (auth()->user()->role === 'admin')
+                                        <form action="{{ route('progres_proyek.destroy', $p->progres_id) }}" method="POST"
+                                            onsubmit="return confirm('Yakin hapus progres ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" title="Hapus">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                </div>
+                            </td>
                         </tr>
                     @empty
                         <tr>

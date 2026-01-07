@@ -15,7 +15,7 @@ class CheckRole
                 ->withErrors('Silahkan login terlebih dahulu!');
         }
 
-        // Ambil role user saat ini
+        // Ambil role usera saat ini
         $userRole = Auth::user()->role;
 
         // Jika role user tidak ada dalam daftar role yang diperbolehkan
